@@ -10,6 +10,26 @@ import (
 
 var baseURL string = "wss://api.upbit.com/websocket/v1"
 
+type ticketField struct {
+	ticket string
+}
+
+type typeField struct {
+	reqType        string
+	codes          []string
+	isOnlySnapshot bool
+	isOnlyRealtime bool
+}
+
+type formatField struct {
+	format string
+}
+
+type req struct {
+	reqType string
+	codes   []string
+}
+
 func main() {
 	initWebsocketClient()
 }
