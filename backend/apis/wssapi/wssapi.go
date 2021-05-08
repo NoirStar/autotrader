@@ -14,7 +14,8 @@ import (
 
 var baseURI string = env.GetEnv("UPBIT_WSS_BASE_URL")
 
-func initWSSClient() {
+// InitWSSClient 웹소켓 초기화
+func InitWSSClient() {
 	fmt.Println("Starting WSS Client")
 
 	var limit int64 = 1024 * 1024 * 32
