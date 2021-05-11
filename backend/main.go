@@ -4,14 +4,22 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"runtime"
+	"sync"
 
 	"github.com/noirstar/autotrading/backend/models"
 	"github.com/noirstar/autotrading/backend/utils/env"
 	"github.com/noirstar/autotrading/backend/utils/myerr"
 )
 
+var wg sync.WaitGroup
+
 func main() {
 
+}
+
+func memConsumed() uint64 {
+	runtime.GC()
 }
 
 func test() {
