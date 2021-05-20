@@ -1,10 +1,14 @@
 package myerr
 
-import "log"
+import (
+	"fmt"
+
+	"github.com/pkg/errors"
+)
 
 // CheckErr checking err
 func CheckErr(err error) {
 	if err != nil {
-		log.Fatalln(err)
+		fmt.Printf("ERROR: %+v\r\n", errors.Wrap(err, ""))
 	}
 }
