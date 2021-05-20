@@ -1,7 +1,7 @@
 package models
 
-// ResTicker 현재가 응답 데이터 포멧
-type ResTicker struct {
+// ResTickerWSS 현재가 응답 데이터 포멧
+type ResTickerWSS struct {
 	Type               string  `json:"type"`                  // 타입 : ticker
 	Code               string  `json:"code"`                  // 마켓코드
 	OpeningPrice       float64 `json:"opening_price"`         // 시가
@@ -39,8 +39,8 @@ type ResTicker struct {
 	StreamType         string  `json:"stream_type"`           // 스트림 타입 SNAPSHOT : 스냅샷 REALTIME : 실시간
 }
 
-// ResTrade 체결 응답 데이터 포멧
-type ResTrade struct {
+// ResTradeWSS 체결 응답 데이터 포멧
+type ResTradeWSS struct {
 	Type             string  `json:"type"`               // 타입 : trade
 	Code             string  `json:"code"`               // 마켓코드
 	TradePrice       float64 `json:"trade_price"`        // 체결 가격
@@ -57,8 +57,8 @@ type ResTrade struct {
 	StreamType       string  `json:"stream_type"`        // 스트림 타입  SNAPSHOT : 스냅샷 REALTIME : 실시간
 }
 
-// ResOrder 체결 응답 데이터 포멧
-type ResOrder struct {
+// ResOrderWSS 체결 응답 데이터 포멧
+type ResOrderWSS struct {
 	Type           string          `json:"type"`            // 타입 : orderbook
 	Code           string          `json:"code"`            // 마켓코드
 	TotalAskSize   float64         `json:"total_ask_size"`  // 호가 매도 총 잔량

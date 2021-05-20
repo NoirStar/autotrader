@@ -1,6 +1,16 @@
 package models
 
-// ResChance struct 주문 가능 정보 응답
+// ResAccount struct 전체 계좌 조회
+type ResAccount struct {
+	Currency            string `json:"currency"`               // 화폐를 의미하는 영문 대문자 코드
+	Balance             string `json:"balance"`                // 주문가능 금액/수량
+	Locked              string `json:"locked"`                 // 주문 중 묶여있는 금액/수량
+	AvgBuyPrice         string `json:"avg_buy_price"`          // 매수평균가
+	AvgBuyPriceModified bool   `json:"avg_buy_price_modified"` // 매수평균가 수정 여부
+	UsnitCurrency       string `json:"unit_currency"`          // 평단가 기준 화폐
+}
+
+// ResChance struct 주문 가능 정보
 type ResChance struct {
 	BidFee     string  `json:"bid_fee"`     // 매수 수수료 비율
 	AskFee     string  `json:"ask_fee"`     // 매도 수수료 비율
@@ -34,4 +44,12 @@ type account struct {
 	AvgBuyPrice         string `json:"avg_buy_price"`          // 매수평균가
 	AvgBuyPriceModified bool   `json:"avg_buy_price_modified"` // 매수평균가 수정 여부
 	UnitCurrency        string `json:"unit_currency"`          // 평단가 기준 화폐
+}
+
+// ResOrderSearch struct 개별 주문 조회
+type ResOrderSearch struct {
+}
+
+// ResOrdersSearch struct 주문 리스트 조회
+type ResOrdersSearch struct {
 }

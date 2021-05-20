@@ -44,7 +44,7 @@ func InitWSSClient() {
 	for {
 
 		msg := <-cIncomingMsg
-		data := models.ResTrade{}
+		data := models.ResTradeWSS{}
 		err := json.Unmarshal(msg, &data)
 		myerr.CheckErr(err)
 
