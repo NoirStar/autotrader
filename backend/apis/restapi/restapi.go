@@ -23,7 +23,7 @@ func GetAccount(accessKey string, secretKey string) []byte {
 }
 
 // GetOrderChance 주문 가능 정보 - 마켓별 주문 가능 정보 확인
-func GetOrderChance(accessKey string, secretKey string, query map[string]string) []byte {
+func GetOrderChance(accessKey string, secretKey string, query interface{}) []byte {
 
 	reqURL := baseURL + "/v1/orders/chance"
 	tokenString := jwt.GetJwtTokenWithQuery(accessKey, secretKey, query)

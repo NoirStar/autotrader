@@ -1,11 +1,10 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
+	"reflect"
 
 	"github.com/noirstar/autotrading/backend/models"
-	"github.com/noirstar/autotrading/backend/utils/myerr"
 )
 
 func main() {
@@ -24,7 +23,6 @@ func main() {
 	// fmt.Println(string(res))
 	a := models.ReqOrders{}
 	a.Identifier = "ab"
-	e, err := json.Marshal(a)
-	myerr.CheckErr(err)
-	fmt.Println(string(e))
+	v := reflect.ValueOf(a)
+	fmt.Println(v)
 }
