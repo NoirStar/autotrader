@@ -48,8 +48,36 @@ type account struct {
 
 // ResOrderSearch struct 개별 주문 조회
 type ResOrderSearch struct {
+	UUID            string   `json:"uuid"`             // 주문의 고유 아이디
+	Side            string   `json:"side"`             // 주문 종류
+	OrdType         string   `json:"ord_type"`         // 주문 방식
+	Price           string   `json:"price"`            // 주문 당시 화폐 가격
+	State           string   `json:"state"`            // 주문 상태
+	Market          string   `json:"market"`           //	마켓의 유일키
+	CreatedAt       string   `json:"created_at"`       // 주문 생성 시간
+	Volume          string   `json:"volume"`           // 사용자가 입력한 주문 양
+	RemainingVolume string   `json:"remaining_volume"` // 체결 후 남은 주문 양
+	ReservedFee     string   `json:"reserved_fee"`     // 수수료로 예약된 비용
+	RemainingFee    string   `json:"remaining_fee"`    // 남은 수수료
+	PaidFee         string   `json:"paid_fee"`         // 사용된 수수료
+	Locked          string   `json:"locked"`           // 주문의 고유 아이디
+	ExecutedVolume  string   `json:"executed_volume"`  // 해당 주문에 걸린 체결 수
+	TradeCount      int      `json:"trade_count"`      // 주문의 고유 아이디
+	Trades          []trades `json:"trades"`           // 체결
+}
+
+type trades struct {
+	Market    string `json:"market"`     // 마켓의 유일 키
+	UUID      string `json:"uuid"`       // 체결의 고유 아이디
+	Price     string `json:"price"`      // 체결 가격
+	Volume    string `json:"volume"`     // 체결 양
+	Funds     string `json:"funds"`      // 체결된 총 가격
+	Side      string `json:"side"`       // 체결 종류
+	CreatedAt string `json:"created_at"` // 체결 시각
 }
 
 // ResOrdersSearch struct 주문 리스트 조회
 type ResOrdersSearch struct {
+	CreatedAt string `json:"created_at"` //
+
 }
