@@ -43,7 +43,7 @@ type ReqOrders struct {
 
 // ReqMinuteCandles struct 시세 캔들 조회(분)
 type ReqMinuteCandles struct {
-	Unit   string `json:"unit"`   // 분 단위. 가능한 값 : 1, 3, 5, 15, 10, 30, 60, 240
+	// Unit   string `json:"unit"`   // 분 단위. 가능한 값 : 1, 3, 5, 15, 10, 30, 60, 240
 	Market string `json:"market"` // 마켓 코드 (ex. KRW-BTC)
 	To     string `json:"to"`     // 마지막 캔들 시각 (exclusive). 포맷 : yyyy-MM-dd'T'HH:mm:ss'Z' or yyyy-MM-dd HH:mm:ss. 비워서 요청시 가장 최근 캔들
 	Count  uint32 `json:"count"`  // 캔들 개수(최대 200개까지 요청 가능)

@@ -69,20 +69,43 @@ func PostOrder(accessKey string, secretKey string, query map[string]interface{})
 }
 
 // GetMarketCode 마켓 코드 조회 - 업비트에서 거래 가능한 마켓 목록
-func GetMarketCode() []byte {
+func GetMarketCode(query map[string]interface{}) []byte {
 
 	reqURL := baseURL + "/v1/market/all"
 
-	client := &http.Client{}
-	req, err := http.NewRequest("GET", reqURL, nil)
-	myerr.CheckErr(err)
-	res, err := client.Do(req)
-	myerr.CheckErr(err)
-	bytes, err := ioutil.ReadAll(res.Body)
-	myerr.CheckErr(err)
-	defer res.Body.Close()
+	return RequestToServerSimple(reqURL, "GET", query)
+}
 
-	return bytes
+// GetMinuteCandles 분 캔들 조회
+func GetMinuteCandles(query map[string]interface{}, unit string) []byte {
+
+	reqURL := baseURL + "/v1/candles/minutes/" + unit
+
+	return RequestToServerSimple(reqURL, "GET", query)
+}
+
+// GetDayCandles 일 캔들 조회
+func GetDayCandles(query map[string]interface{}) []byte {
+
+	reqURL := baseURL + "/v1/candles/days"
+
+	return RequestToServerSimple(reqURL, "GET", query)
+}
+
+// GetWeekCandles 주 캔들 조회
+func GetWeekCandles(query map[string]interface{}) []byte {
+
+	reqURL := baseURL + "/v1/candles/weeks"
+
+	return RequestToServerSimple(reqURL, "GET", query)
+}
+
+// GetMonthsCandles 달 캔들 조회
+func GetMonthsCandles(query map[string]interface{}) []byte {
+
+	reqURL := baseURL + "/v1/candles/months"
+
+	return RequestToServerSimple(reqURL, "GET", query)
 }
 
 // RequestToServer 업비트 서버로 요청
@@ -117,13 +140,50 @@ func RequestToServer(reqURL string, method string, tokenString string, query map
 	req.Header.Add("Authorization", "Bearer "+tokenString)
 	res, err := client.Do(req)
 	myerr.CheckErr(err)
-
 	bytes, err := ioutil.ReadAll(res.Body)
 	myerr.CheckErr(err)
-
 	defer res.Body.Close()
 
 	return bytes
+}
+
+// RequestToServerSimple 토큰 미포함 요청
+func RequestToServerSimple(reqURL string, method string, query map[string]interface{}) []byte {
+
+	client := &http.Client{}
+	req, err := http.NewRequest(method, reqURL, nil)
+	myerr.CheckErr(err)
+
+	q := req.URL.Query()
+
+	for key, value := range query {
+		switch val := value.(type) {
+		case string:
+			q.Add(key, value.(string))
+		case int, uint32, uint64:
+			q.Add(key, value.(string))
+		case []string:
+			for _, v := range val {
+				q.Add(key, v)
+			}
+		case []interface{}:
+			for _, v := range val {
+				q.Add(key, v.(string))
+			}
+		}
+	}
+	req.URL.RawQuery = q.Encode()
+
+	fmt.Println(q.Encode())
+
+	res, err := client.Do(req)
+	myerr.CheckErr(err)
+	bytes, err := ioutil.ReadAll(res.Body)
+	myerr.CheckErr(err)
+	defer res.Body.Close()
+
+	return bytes
+
 }
 
 // ConvertStructToMap struct -> map[string]interface{}
