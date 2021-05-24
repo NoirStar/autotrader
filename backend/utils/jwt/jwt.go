@@ -22,14 +22,28 @@ func GetJwtToken(accessKey string, secretKey string) string {
 }
 
 // GetJwtTokenWithQuery jwt token 생성 (쿼리값 포함)
-func GetJwtTokenWithQuery(accessKey string, secretKey string, query map[string]string) string {
+func GetJwtTokenWithQuery(accessKey string, secretKey string, query map[string]interface{}) string {
 
-	params := url.Values{}
+	q := url.Values{}
+
 	for key, value := range query {
-		params.Add(key, value)
+		switch val := value.(type) {
+		case string:
+			q.Add(key, value.(string))
+		case int, uint32, uint64:
+			q.Add(key, value.(string))
+		case []string:
+			for _, v := range val {
+				q.Add(key, v)
+			}
+		case []interface{}:
+			for _, v := range val {
+				q.Add(key, v.(string))
+			}
+		}
 	}
 
-	queryHash := fmt.Sprintf("%x", sha512.Sum512([]byte(params.Encode())))
+	queryHash := fmt.Sprintf("%x", sha512.Sum512([]byte(q.Encode())))
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"access_key":     accessKey,
