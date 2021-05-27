@@ -151,7 +151,7 @@ type ResMinuteCandles struct {
 	HighPrice            float64 `json:"high_price"`              // 고가
 	LowPrice             float64 `json:"low_price"`               // 저가
 	TradePrice           float64 `json:"trade_price"`             // 종가
-	Timestamp            int     `json:"timestamp"`               // 해당 캔들에서 마지막 틱이 저장된 시각
+	Timestamp            int64   `json:"timestamp"`               // 해당 캔들에서 마지막 틱이 저장된 시각
 	CandleAccTradePrice  float64 `json:"candle_acc_trade_price"`  // 누적 거래 금액
 	CandleAccTradeVolume float64 `json:"candle_acc_trade_volume"` // 누적 거래량
 	Unit                 int     `json:"unit"`                    // 분 단위(유닛)
@@ -166,7 +166,7 @@ type ResDayCandles struct {
 	HighPrice            float64 `json:"high_price"`                      // 고가
 	LowPrice             float64 `json:"low_price"`                       // 저가
 	TradePrice           float64 `json:"trade_price"`                     // 종가
-	Timestamp            int     `json:"timestamp"`                       // 마지막 틱이 저장된 시각
+	Timestamp            int64   `json:"timestamp"`                       // 마지막 틱이 저장된 시각
 	CandleAccTradePrice  float64 `json:"candle_acc_trade_price"`          // 누적 거래 금액
 	CandleAccTradeVolume float64 `json:"candle_acc_trade_volume"`         // 누적 거래량
 	PrevClosingPrice     float64 `json:"prev_closing_price"`              // 전일 종가(UTC 0시 기준)
@@ -184,7 +184,7 @@ type ResWeekCandles struct {
 	HighPrice            float64 `json:"high_price"`              // 고가
 	LowPrice             float64 `json:"low_price"`               // 저가
 	TradePrice           float64 `json:"trade_price"`             // 종가
-	Timestamp            int     `json:"timestamp"`               // 마지막 틱이 저장된 시각
+	Timestamp            int64   `json:"timestamp"`               // 마지막 틱이 저장된 시각
 	CandleAccTradePrice  float64 `json:"candle_acc_trade_price"`  // 누적 거래 금액
 	CandleAccTradeVolume float64 `json:"candle_acc_trade_volume"` // 누적 거래량
 	FirstDayOfPeriod     string  `json:"first_day_of_period"`     // 캔들 기간의 가장 첫 날
@@ -199,7 +199,7 @@ type ResMonthCandles struct {
 	HighPrice            float64 `json:"high_price"`              // 고가
 	LowPrice             float64 `json:"low_price"`               // 저가
 	TradePrice           float64 `json:"trade_price"`             // 종가
-	Timestamp            int     `json:"timestamp"`               // 마지막 틱이 저장된 시각
+	Timestamp            int64   `json:"timestamp"`               // 마지막 틱이 저장된 시각
 	CandleAccTradePrice  float64 `json:"candle_acc_trade_price"`  // 누적 거래 금액
 	CandleAccTradeVolume float64 `json:"candle_acc_trade_volume"` // 누적 거래량
 	FirstDayOfPeriod     string  `json:"first_day_of_period"`     // 캔들 기간의 가장 첫 날
