@@ -44,29 +44,29 @@ type ReqOrders struct {
 // ReqMinuteCandles struct 시세 캔들 조회(분)
 type ReqMinuteCandles struct {
 	// Unit   string `json:"unit"`   // 분 단위. 가능한 값 : 1, 3, 5, 15, 10, 30, 60, 240
-	Market string `json:"market"` // 마켓 코드 (ex. KRW-BTC)
-	To     string `json:"to"`     // 마지막 캔들 시각 (exclusive). 포맷 : yyyy-MM-dd'T'HH:mm:ss'Z' or yyyy-MM-dd HH:mm:ss. 비워서 요청시 가장 최근 캔들
-	Count  uint32 `json:"count"`  // 캔들 개수(최대 200개까지 요청 가능)
+	Market string `json:"market"`       // 마켓 코드 (ex. KRW-BTC)
+	To     string `json:"to,omitempty"` // 마지막 캔들 시각 (exclusive). 포맷 : yyyy-MM-dd'T'HH:mm:ss'Z' or yyyy-MM-dd HH:mm:ss. 비워서 요청시 가장 최근 캔들
+	Count  uint32 `json:"count"`        // 캔들 개수(최대 200개까지 요청 가능)
 }
 
 // ReqDayCandles struct 시세 캔들 조회(일)
 type ReqDayCandles struct {
 	Market              string `json:"market"`                        // 마켓 코드 (ex. KRW-BTC)
-	To                  string `json:"to"`                            // 마지막 캔들 시각 (exclusive). 포맷 : yyyy-MM-dd'T'HH:mm:ss'Z' or yyyy-MM-dd HH:mm:ss. 비워서 요청시 가장 최근 캔들
+	To                  string `json:"to,omitempty"`                  // 마지막 캔들 시각 (exclusive). 포맷 : yyyy-MM-dd'T'HH:mm:ss'Z' or yyyy-MM-dd HH:mm:ss. 비워서 요청시 가장 최근 캔들
 	Count               uint32 `json:"count"`                         // 캔들 개수
 	ConvertingPriceUnit string `json:"convertingPriceUnit,omitempty"` // 종가 환산 화폐 단위 (생략 가능, KRW로 명시할 시 원화 환산 가격을 반환.)
 }
 
 // ReqWeekCandles struct 시세 캔들 조회(주)
 type ReqWeekCandles struct {
-	Market string `json:"market"` // 마켓 코드 (ex. KRW-BTC)
-	To     string `json:"to"`     // 마지막 캔들 시각 (exclusive). 포맷 : yyyy-MM-dd'T'HH:mm:ss'Z' or yyyy-MM-dd HH:mm:ss. 비워서 요청시 가장 최근 캔들
-	Count  uint32 `json:"count"`  // 캔들 개수
+	Market string `json:"market"`       // 마켓 코드 (ex. KRW-BTC)
+	To     string `json:"to,omitempty"` // 마지막 캔들 시각 (exclusive). 포맷 : yyyy-MM-dd'T'HH:mm:ss'Z' or yyyy-MM-dd HH:mm:ss. 비워서 요청시 가장 최근 캔들
+	Count  uint32 `json:"count"`        // 캔들 개수
 }
 
 // ReqMonthCandles struct 시세 캔들 조회(월)
 type ReqMonthCandles struct {
-	Market string `json:"market"` // 마켓 코드 (ex. KRW-BTC)
-	To     string `json:"to"`     // 마지막 캔들 시각 (exclusive). 포맷 : yyyy-MM-dd'T'HH:mm:ss'Z' or yyyy-MM-dd HH:mm:ss. 비워서 요청시 가장 최근 캔들
-	Count  uint32 `json:"count"`  // 캔들 개수
+	Market string `json:"market"`       // 마켓 코드 (ex. KRW-BTC)
+	To     string `json:"to,omitempty"` // 마지막 캔들 시각 (exclusive). 포맷 : yyyy-MM-dd'T'HH:mm:ss'Z' or yyyy-MM-dd HH:mm:ss. 비워서 요청시 가장 최근 캔들
+	Count  uint32 `json:"count"`        // 캔들 개수
 }

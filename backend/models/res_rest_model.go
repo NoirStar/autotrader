@@ -147,14 +147,14 @@ type ResMinuteCandles struct {
 	Market               string  `json:"market"`                  // 마켓명
 	CandleDateTimeUTC    string  `json:"candle_date_time_utc"`    // 캔들 기준 시각(UTC 기준)
 	CandleDateTimeKST    string  `json:"candle_date_time_kst"`    // 캔들 기준 시각(KST 기준)
-	OpeningPrice         string  `json:"opening_price"`           // 시가
-	HighPrice            string  `json:"high_price"`              // 고가
-	LowPrice             string  `json:"low_price"`               // 저가
-	TradePrice           string  `json:"trade_price"`             // 종가
+	OpeningPrice         float64 `json:"opening_price"`           // 시가
+	HighPrice            float64 `json:"high_price"`              // 고가
+	LowPrice             float64 `json:"low_price"`               // 저가
+	TradePrice           float64 `json:"trade_price"`             // 종가
 	Timestamp            int     `json:"timestamp"`               // 해당 캔들에서 마지막 틱이 저장된 시각
 	CandleAccTradePrice  float64 `json:"candle_acc_trade_price"`  // 누적 거래 금액
 	CandleAccTradeVolume float64 `json:"candle_acc_trade_volume"` // 누적 거래량
-	Unit                 string  `json:"unit"`                    // 분 단위(유닛)
+	Unit                 int     `json:"unit"`                    // 분 단위(유닛)
 }
 
 // ResDayCandles struct 시세 캔들 조회(일)
@@ -162,10 +162,10 @@ type ResDayCandles struct {
 	Market               string  `json:"market"`                          // 마켓명
 	CandleDateTimeUTC    string  `json:"candle_date_time_utc"`            // 캔들 기준 시각(UTC 기준)
 	CandleDateTimeKST    string  `json:"candle_date_time_kst"`            // 캔들 기준 시각(KST 기준)
-	OpeningPrice         string  `json:"opening_price"`                   // 시가
-	HighPrice            string  `json:"high_price"`                      // 고가
-	LowPrice             string  `json:"low_price"`                       // 저가
-	TradePrice           string  `json:"trade_price"`                     // 종가
+	OpeningPrice         float64 `json:"opening_price"`                   // 시가
+	HighPrice            float64 `json:"high_price"`                      // 고가
+	LowPrice             float64 `json:"low_price"`                       // 저가
+	TradePrice           float64 `json:"trade_price"`                     // 종가
 	Timestamp            int     `json:"timestamp"`                       // 마지막 틱이 저장된 시각
 	CandleAccTradePrice  float64 `json:"candle_acc_trade_price"`          // 누적 거래 금액
 	CandleAccTradeVolume float64 `json:"candle_acc_trade_volume"`         // 누적 거래량
@@ -180,10 +180,10 @@ type ResWeekCandles struct {
 	Market               string  `json:"market"`                  // 마켓명
 	CandleDateTimeUTC    string  `json:"candle_date_time_utc"`    // 캔들 기준 시각(UTC 기준)
 	CandleDateTimeKST    string  `json:"candle_date_time_kst"`    // 캔들 기준 시각(KST 기준)
-	OpeningPrice         string  `json:"opening_price"`           // 시가
-	HighPrice            string  `json:"high_price"`              // 고가
-	LowPrice             string  `json:"low_price"`               // 저가
-	TradePrice           string  `json:"trade_price"`             // 종가
+	OpeningPrice         float64 `json:"opening_price"`           // 시가
+	HighPrice            float64 `json:"high_price"`              // 고가
+	LowPrice             float64 `json:"low_price"`               // 저가
+	TradePrice           float64 `json:"trade_price"`             // 종가
 	Timestamp            int     `json:"timestamp"`               // 마지막 틱이 저장된 시각
 	CandleAccTradePrice  float64 `json:"candle_acc_trade_price"`  // 누적 거래 금액
 	CandleAccTradeVolume float64 `json:"candle_acc_trade_volume"` // 누적 거래량
@@ -195,10 +195,10 @@ type ResMonthCandles struct {
 	Market               string  `json:"market"`                  // 마켓명
 	CandleDateTimeUTC    string  `json:"candle_date_time_utc"`    // 캔들 기준 시각(UTC 기준)
 	CandleDateTimeKST    string  `json:"candle_date_time_kst"`    // 캔들 기준 시각(KST 기준)
-	OpeningPrice         string  `json:"opening_price"`           // 시가
-	HighPrice            string  `json:"high_price"`              // 고가
-	LowPrice             string  `json:"low_price"`               // 저가
-	TradePrice           string  `json:"trade_price"`             // 종가
+	OpeningPrice         float64 `json:"opening_price"`           // 시가
+	HighPrice            float64 `json:"high_price"`              // 고가
+	LowPrice             float64 `json:"low_price"`               // 저가
+	TradePrice           float64 `json:"trade_price"`             // 종가
 	Timestamp            int     `json:"timestamp"`               // 마지막 틱이 저장된 시각
 	CandleAccTradePrice  float64 `json:"candle_acc_trade_price"`  // 누적 거래 금액
 	CandleAccTradeVolume float64 `json:"candle_acc_trade_volume"` // 누적 거래량

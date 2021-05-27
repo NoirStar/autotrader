@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"strconv"
 
 	"github.com/noirstar/autotrading/backend/models"
 	"github.com/noirstar/autotrading/backend/utils/env"
@@ -83,9 +84,9 @@ func GetMarketCode() []byte {
 }
 
 // GetMinuteCandles 분 캔들 조회
-func GetMinuteCandles(query *models.ReqMinuteCandles, unit string) []byte {
+func GetMinuteCandles(query *models.ReqMinuteCandles, unit int) []byte {
 
-	reqURL := baseURL + "/v1/candles/minutes/" + unit
+	reqURL := baseURL + "/v1/candles/minutes/" + strconv.Itoa(unit)
 
 	return RequestToServerSimple(reqURL, "GET", ConvertStructToMap(query))
 }
@@ -127,8 +128,8 @@ func RequestToServer(reqURL string, method string, tokenString string, query map
 		switch val := value.(type) {
 		case string:
 			q.Add(key, value.(string))
-		case int, uint32, uint64:
-			q.Add(key, value.(string))
+		case int, uint32, uint64, float64:
+			q.Add(key, fmt.Sprint(value))
 		case []string:
 			for _, v := range val {
 				q.Add(key, v)
@@ -166,8 +167,8 @@ func RequestToServerSimple(reqURL string, method string, query map[string]interf
 		switch val := value.(type) {
 		case string:
 			q.Add(key, value.(string))
-		case int, uint32, uint64:
-			q.Add(key, value.(string))
+		case int, uint32, uint64, float64:
+			q.Add(key, fmt.Sprint(value))
 		case []string:
 			for _, v := range val {
 				q.Add(key, v)
@@ -193,6 +194,7 @@ func RequestToServerSimple(reqURL string, method string, query map[string]interf
 }
 
 // ConvertStructToMap struct -> map[string]interface{}
+// 데이터를 unmarshal 하는 과정중 숫자 데이터는 float64로 변한됨. 큰값 전송시, 오버플로 현상 발생가능 (이러면 모델 숫자 타입을 정의하는 의미가.. 없는데)
 func ConvertStructToMap(object interface{}) map[string]interface{} {
 	conv := make(map[string]interface{})
 	tmp, err := json.Marshal(object)
