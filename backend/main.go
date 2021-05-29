@@ -7,14 +7,15 @@ import (
 
 	"github.com/noirstar/autotrading/backend/apis/restapi"
 	"github.com/noirstar/autotrading/backend/models"
+	"github.com/noirstar/autotrading/backend/utils/env"
 	"github.com/sdcoffey/big"
 	"github.com/sdcoffey/techan"
 )
 
 func main() {
 
-	//accessKey := env.GetEnv("UPBIT_ACCESS_KEY")
-	//secretKey := env.GetEnv("UPBIT_SECRET_KEY")
+	accessKey := env.GetEnv("UPBIT_ACCESS_KEY")
+	secretKey := env.GetEnv("UPBIT_SECRET_KEY")
 
 	req := models.ReqMinuteCandles{
 		Market: "KRW-BTC",
