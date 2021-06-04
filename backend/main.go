@@ -20,15 +20,17 @@ func main() {
 
 	req := models.ReqMinuteCandles{
 		Market: "KRW-BTC",
-		Count:  180,
+		Count:  200,
 	}
 	res := []models.ResMinuteCandles{}
 
 	reqText := restapi.GetMinuteCandles(&req, 1)
 	json.Unmarshal(reqText, &res)
 
+	fmt.Println(res[0])
+
 	series := techan.NewTimeSeries()
-	for i := len(res) - 1; i >= 0; i-- {
+	for i := 0; i < len(res); i++ {
 		layout := strings.Split(time.RFC3339, "Z")[0]
 		start, err := time.Parse(layout, res[i].CandleDateTimeKST)
 		myerr.CheckErr(err)
@@ -46,7 +48,9 @@ func main() {
 	closePrices := techan.NewClosePriceIndicator(series)
 	movingAverage := techan.NewSimpleMovingAverage(closePrices, 10) // Create an exponential moving average with a window of 10
 
-	fmt.Println(movingAverage.Calculate(100).FormattedString(2))
-	//fmt.Printf("%.2f", res[len(res)-1].TradePrice)
+	//fmt.Println(movingAverage.Calculate(100).FormattedString(2))
 
+	for i := 0; i < len(res); i++ {
+		fmt.Println(movingAverage.Calculate(i).FormattedString(0))
+	}
 }
