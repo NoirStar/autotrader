@@ -26,11 +26,9 @@ func main() {
 
 	reqText := restapi.GetMinuteCandles(&req, 1)
 	json.Unmarshal(reqText, &res)
-
-	fmt.Println(res[0])
-
+	fmt.Println(res[0].TradePrice)
 	series := techan.NewTimeSeries()
-	for i := 0; i < len(res); i++ {
+	for i := len(res) - 1; i >= 0; i-- {
 		layout := strings.Split(time.RFC3339, "Z")[0]
 		start, err := time.Parse(layout, res[i].CandleDateTimeKST)
 		myerr.CheckErr(err)
@@ -45,12 +43,43 @@ func main() {
 		series.AddCandle(candle)
 	}
 
-	closePrices := techan.NewClosePriceIndicator(series)
-	movingAverage := techan.NewSimpleMovingAverage(closePrices, 10) // Create an exponential moving average with a window of 10
+	//closePrices := techan.NewClosePriceIndicator(series)
+	//movingAverage := techan.NewSimpleMovingAverage(closePrices, 10)
 
-	//fmt.Println(movingAverage.Calculate(100).FormattedString(2))
+	indicator := techan.NewClosePriceIndicator(series)
+
+	order := techan.Order{
+		Side:          techan.BUY,
+		Security:      "what",
+		Price:         big.NewDecimal(res[0].TradePrice),
+		Amount:        big.NewDecimal(1),
+		ExecutionTime: time.Now(),
+	}
+
+	record := techan.NewTradingRecord()
+	record.Operate(order)
+
+	entryConstant := techan.NewConstantIndicator(30)
+	exitConstant := techan.NewConstantIndicator(10)
+
+	entryRule := techan.And(
+		techan.NewCrossUpIndicatorRule(entryConstant, indicator),
+		techan.PositionNewRule{})
+
+	exitRule := techan.And(
+		techan.NewCrossDownIndicatorRule(indicator, exitConstant),
+		techan.PositionOpenRule{})
+
+	strategy := techan.RuleStrategy{
+		UnstablePeriod: 10,
+		EntryRule:      entryRule,
+		ExitRule:       exitRule,
+	}
 
 	for i := 0; i < len(res); i++ {
-		fmt.Println(movingAverage.Calculate(i).FormattedString(0))
+		if strategy.ShouldEnter(i, record) {
+			fmt.Println(i, strategy.ShouldEnter(i, record))
+		}
 	}
+
 }
