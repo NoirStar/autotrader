@@ -1,4 +1,4 @@
-package jwt
+package utils
 
 import (
 	"crypto/sha512"
@@ -7,22 +7,23 @@ import (
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/google/uuid"
-	"github.com/noirstar/autotrading/backend/utils/myerr"
 )
 
 // GetJwtToken jwt token 생성
-func GetJwtToken(accessKey string, secretKey string) string {
+func GetJwtToken(accessKey string, secretKey string) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"access_key": accessKey,
 		"nonce":      uuid.New(),
 	})
 	tokenString, err := token.SignedString([]byte(secretKey))
-	myerr.CheckErr(err)
-	return tokenString
+	if err != nil {
+		return "", err
+	}
+	return tokenString, nil
 }
 
 // GetJwtTokenWithQuery jwt token 생성 (쿼리값 포함)
-func GetJwtTokenWithQuery(accessKey string, secretKey string, query map[string]interface{}) string {
+func GetJwtTokenWithQuery(accessKey string, secretKey string, query map[string]interface{}) (string, error) {
 
 	q := url.Values{}
 
@@ -52,6 +53,8 @@ func GetJwtTokenWithQuery(accessKey string, secretKey string, query map[string]i
 		"query_hash_alg": "SHA512",
 	})
 	tokenString, err := token.SignedString([]byte(secretKey))
-	myerr.CheckErr(err)
-	return tokenString
+	if err != nil {
+		return "", nil
+	}
+	return tokenString, nil
 }

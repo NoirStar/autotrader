@@ -9,18 +9,17 @@ import (
 	"strconv"
 
 	"github.com/noirstar/autotrading/backend/models"
-	"github.com/noirstar/autotrading/backend/utils/env"
-	"github.com/noirstar/autotrading/backend/utils/jwt"
-	"github.com/noirstar/autotrading/backend/utils/myerr"
+	"github.com/noirstar/autotrading/backend/utils"
 )
 
-var baseURL = env.GetEnv("UPBIT_BASE_URL")
+var baseURL = utils.GetEnv("UPBIT_BASE_URL")
 
 // GetAccount 전체 계좌 조회
 func GetAccount(accessKey string, secretKey string) []byte {
 
 	reqURL := baseURL + "/v1/accounts"
-	tokenString := jwt.GetJwtToken(accessKey, secretKey)
+	tokenString, err := utils.GetJwtToken(accessKey, secretKey)
+	utils.CheckErr(err)
 
 	return RequestToServer(reqURL, "GET", tokenString, nil)
 }
@@ -30,7 +29,8 @@ func GetOrderChance(accessKey string, secretKey string, query *models.ReqChance)
 
 	reqURL := baseURL + "/v1/orders/chance"
 	queryMap := ConvertStructToMap(query)
-	tokenString := jwt.GetJwtTokenWithQuery(accessKey, secretKey, queryMap)
+	tokenString, err := utils.GetJwtTokenWithQuery(accessKey, secretKey, queryMap)
+	utils.CheckErr(err)
 
 	return RequestToServer(reqURL, "GET", tokenString, queryMap)
 }
@@ -40,7 +40,8 @@ func GetOrderSearch(accessKey string, secretKey string, query *models.ReqOrderSe
 
 	reqURL := baseURL + "/v1/order"
 	queryMap := ConvertStructToMap(query)
-	tokenString := jwt.GetJwtTokenWithQuery(accessKey, secretKey, queryMap)
+	tokenString, err := utils.GetJwtTokenWithQuery(accessKey, secretKey, queryMap)
+	utils.CheckErr(err)
 
 	return RequestToServer(reqURL, "GET", tokenString, queryMap)
 }
@@ -50,7 +51,8 @@ func GetOrdersSearch(accessKey string, secretKey string, query *models.ReqOrders
 
 	reqURL := baseURL + "/v1/orders"
 	queryMap := ConvertStructToMap(query)
-	tokenString := jwt.GetJwtTokenWithQuery(accessKey, secretKey, queryMap)
+	tokenString, err := utils.GetJwtTokenWithQuery(accessKey, secretKey, queryMap)
+	utils.CheckErr(err)
 
 	return RequestToServer(reqURL, "GET", tokenString, queryMap)
 }
@@ -60,7 +62,8 @@ func DeleteOrder(accessKey string, secretKey string, query *models.ReqDeleteOrde
 
 	reqURL := baseURL + "/v1/order"
 	queryMap := ConvertStructToMap(query)
-	tokenString := jwt.GetJwtTokenWithQuery(accessKey, secretKey, queryMap)
+	tokenString, err := utils.GetJwtTokenWithQuery(accessKey, secretKey, queryMap)
+	utils.CheckErr(err)
 
 	return RequestToServer(reqURL, "DELETE", tokenString, queryMap)
 }
@@ -70,7 +73,8 @@ func PostOrder(accessKey string, secretKey string, query *models.ReqOrders) []by
 
 	reqURL := baseURL + "/v1/orders"
 	queryMap := ConvertStructToMap(query)
-	tokenString := jwt.GetJwtTokenWithQuery(accessKey, secretKey, queryMap)
+	tokenString, err := utils.GetJwtTokenWithQuery(accessKey, secretKey, queryMap)
+	utils.CheckErr(err)
 
 	return RequestToServer(reqURL, "POST", tokenString, queryMap)
 }
@@ -120,7 +124,7 @@ func RequestToServer(reqURL string, method string, tokenString string, query map
 
 	client := &http.Client{}
 	req, err := http.NewRequest(method, reqURL, nil)
-	myerr.CheckErr(err)
+	utils.CheckErr(err)
 
 	q := url.Values{}
 
@@ -146,9 +150,9 @@ func RequestToServer(reqURL string, method string, tokenString string, query map
 
 	req.Header.Add("Authorization", "Bearer "+tokenString)
 	res, err := client.Do(req)
-	myerr.CheckErr(err)
+	utils.CheckErr(err)
 	bytes, err := ioutil.ReadAll(res.Body)
-	myerr.CheckErr(err)
+	utils.CheckErr(err)
 	defer res.Body.Close()
 
 	return bytes
@@ -159,7 +163,7 @@ func RequestToServerSimple(reqURL string, method string, query map[string]interf
 
 	client := &http.Client{}
 	req, err := http.NewRequest(method, reqURL, nil)
-	myerr.CheckErr(err)
+	utils.CheckErr(err)
 
 	q := req.URL.Query()
 
@@ -181,12 +185,12 @@ func RequestToServerSimple(reqURL string, method string, query map[string]interf
 	}
 	req.URL.RawQuery = q.Encode()
 
-	fmt.Println(q.Encode())
+	//fmt.Println(q.Encode())
 
 	res, err := client.Do(req)
-	myerr.CheckErr(err)
+	utils.CheckErr(err)
 	bytes, err := ioutil.ReadAll(res.Body)
-	myerr.CheckErr(err)
+	utils.CheckErr(err)
 	defer res.Body.Close()
 
 	return bytes
@@ -198,7 +202,7 @@ func RequestToServerSimple(reqURL string, method string, query map[string]interf
 func ConvertStructToMap(object interface{}) map[string]interface{} {
 	conv := make(map[string]interface{})
 	tmp, err := json.Marshal(object)
-	myerr.CheckErr(err)
+	utils.CheckErr(err)
 	json.Unmarshal(tmp, &conv)
 	return conv
 }

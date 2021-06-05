@@ -7,12 +7,10 @@ import (
 
 	"github.com/gorilla/websocket"
 	"github.com/noirstar/autotrading/backend/models"
-	"github.com/noirstar/autotrading/backend/utils/env"
-	"github.com/noirstar/autotrading/backend/utils/money"
-	"github.com/noirstar/autotrading/backend/utils/myerr"
+	"github.com/noirstar/autotrading/backend/utils"
 )
 
-var baseURI string = env.GetEnv("UPBIT_WSS_BASE_URL")
+var baseURI string = utils.GetEnv("UPBIT_WSS_BASE_URL")
 
 // InitWSSClient 웹소켓 초기화
 func InitWSSClient() {
@@ -29,7 +27,7 @@ func InitWSSClient() {
 	ws, _, err := d.Dial(baseURI+"/websocket/v1", header)
 	ws.SetReadLimit(limit)
 
-	myerr.CheckErr(err)
+	utils.CheckErr(err)
 
 	defer ws.Close()
 
@@ -46,10 +44,10 @@ func InitWSSClient() {
 		msg := <-cIncomingMsg
 		data := models.ResTradeWSS{}
 		err := json.Unmarshal(msg, &data)
-		myerr.CheckErr(err)
+		utils.CheckErr(err)
 
-		m, err := money.NewMoney(data.TradePrice)
-		myerr.CheckErr(err)
+		m, err := utils.NewMoney(data.TradePrice)
+		utils.CheckErr(err)
 
 		fmt.Println(idx, "Received:", m.Display())
 		idx++
@@ -66,7 +64,7 @@ func readWSMessage(ws *websocket.Conn, cIncomingMsg chan<- []byte) error {
 
 	for {
 		_, msg, err := ws.ReadMessage()
-		myerr.CheckErr(err)
+		utils.CheckErr(err)
 		cIncomingMsg <- msg
 	}
 }
@@ -77,7 +75,7 @@ func sendWSMessage(ws *websocket.Conn, cSendingMsg chan string) error {
 		case params := <-cSendingMsg:
 			fmt.Println("ws send messages", params)
 			err := ws.WriteMessage(websocket.TextMessage, []byte(params))
-			myerr.CheckErr(err)
+			utils.CheckErr(err)
 		}
 	}
 }
