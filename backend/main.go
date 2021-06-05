@@ -16,35 +16,33 @@ import (
 
 func main() {
 
-	req := models.ReqMinuteCandles{
-		Market: "KRW-BTC",
-		Count:  200,
-	}
-	res := []models.ResMinuteCandles{}
-
-	reqText := restapi.GetMinuteCandles(&req, 1)
-	json.Unmarshal(reqText, &res)
-
 	series := MakeSeries(res)
 
 	closePrices := techan.NewClosePriceIndicator(series)
-	movingAverage := techan.NewSimpleMovingAverage(closePrices, 10)
+	//movingAverage := techan.NewEMAIndicator(closePrices, 9)
+	rsi := techan.NewRelativeStrengthIndexIndicator(closePrices, 14)
+	//entryConstant := techan.NewConstantIndicator(30)
 
 	record := techan.NewTradingRecord()
 	// record.Operate(order)
 
+	rsiUpRule := techan.NewCrossDownIndicatorRule(techan.NewConstantIndicator(45), rsi)
+	//emaUpRule := techan.NewCrossUpIndicatorRule(movingAverage, closePrices)
+
+	//combineRule := techan.And(rsiUpRule, emaUpRule)
+
+	rsiDownRule := techan.NewCrossUpIndicatorRule(techan.NewConstantIndicator(60), rsi)
+
 	entryRule := techan.And(
-		// 종가가 ma를 넘어서거나, 새 포지션일때
-		techan.NewCrossUpIndicatorRule(movingAverage, closePrices),
+		rsiUpRule,
 		techan.PositionNewRule{})
 
 	exitRule := techan.And(
-		// 종가가 ma 밑에 오게될때,
-		techan.NewCrossDownIndicatorRule(closePrices, movingAverage),
+		rsiDownRule,
 		techan.PositionOpenRule{})
 
 	strategy := techan.RuleStrategy{
-		UnstablePeriod: 5,
+		UnstablePeriod: 15,
 		EntryRule:      entryRule,
 		ExitRule:       exitRule,
 	}
@@ -55,7 +53,7 @@ func main() {
 
 	for i := 0; i < len(res); i++ {
 		if strategy.ShouldEnter(i, record) {
-			fmt.Println("Enter : ", i, "MA : ", movingAverage.Calculate(i).FormattedString(0), "Price : ", closePrices.Calculate(i).FormattedString(0))
+			fmt.Println("Enter : ", i, "rsi : ", rsi.Calculate(i).FormattedString(0), "Price : ", closePrices.Calculate(i).FormattedString(0))
 			order := techan.Order{
 				Side:          techan.BUY,
 				Security:      uuid.NewString(),
@@ -64,8 +62,9 @@ func main() {
 				ExecutionTime: time.Now(),
 			}
 			record.Operate(order)
+
 		} else if strategy.ShouldExit(i, record) {
-			fmt.Println("Exit : ", i, "MA : ", movingAverage.Calculate(i).FormattedString(0), "Price : ", closePrices.Calculate(i).FormattedString(0))
+			fmt.Println("Exit : ", i, "rsi : ", rsi.Calculate(i).FormattedString(0), "Price : ", closePrices.Calculate(i).FormattedString(0))
 			order := techan.Order{
 				Side:          techan.SELL,
 				Security:      uuid.NewString(),
@@ -75,7 +74,6 @@ func main() {
 			}
 			record.Operate(order)
 		}
-
 	}
 	fmt.Println(account.Analyze(record))
 
@@ -100,4 +98,20 @@ func MakeSeries(candles []models.ResMinuteCandles) *techan.TimeSeries {
 		series.AddCandle(candle)
 	}
 	return series
+}
+
+func candleGenerator(market string, minute int, count int) (candleC chan *techan.Candle, err error) {
+	candleC = make(chan *techan.Candle)
+
+	req := models.ReqMinuteCandles{
+		Market: market,
+		Count:  count,
+	}
+	data := make([]*models.ResMinuteCandles, 0)
+
+	reqText := restapi.GetMinuteCandles(&req, minute)
+	json.Unmarshal(reqText, &data)
+
+	data = data[len(data)-count:]
+
 }
