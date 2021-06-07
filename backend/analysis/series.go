@@ -13,6 +13,21 @@ import (
 	"github.com/sdcoffey/techan"
 )
 
+func GetCandleData(market string, minute int, count int) (candleData []*models.ResMinuteCandles, err error) {
+	data := make([]*models.ResMinuteCandles, 0)
+	if count <= 200 {
+		req := models.ReqMinuteCandles{
+			Market: market,
+			Count:  count,
+		}
+		reqText := restapi.GetMinuteCandles(&req, minute)
+		if err := json.Unmarshal(reqText, &data); err != nil {
+			return nil, err
+		}
+		return data, nil
+	}
+}
+
 // CandleGenerator makes candles
 func CandleGenerator(market string, minute int, count int) (candleC chan *techan.Candle, err error) {
 	candleC = make(chan *techan.Candle)
