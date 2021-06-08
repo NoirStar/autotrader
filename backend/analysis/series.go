@@ -35,34 +35,32 @@ func GetCandleData(market string, minute int, count int) (candleData []*models.R
 		return data, nil
 	} else {
 		candlesC := make(chan []byte)
-		candles := make([]*models.ResMinuteCandles, 0)
 		layout := strings.Split(time.RFC3339, "Z")[0]
 
 		go func() {
 			defer close(candlesC)
 			start, _ := time.Parse(layout, data[len(data)-1].CandleDateTimeUTC)
-			start = start.Add(-time.Minute * 200)
-			for i := 2; i <= int(count/200+1); i++ {
-
-				if i == int(count/200)+1 {
-					fmt.Println(-time.Minute * time.Duration(count-(i-1)*200))
-					start = start.Add(-time.Minute - time.Minute*time.Duration(count-(i-1)*200))
-					time := start.Format(layout)
-					req.To = time + "Z"
-					req.Count = count - (i-1)*200
-				} else {
+			idx := 0
+			for i := count - 200; i > 0; i -= 200 {
+				if idx > 0 {
 					start = start.Add(-time.Minute * 200)
-					time := start.Format(layout)
-					req.To = time + "Z"
-					req.Count = 200
 				}
-				fmt.Println(start)
+				time := start.Format(layout)
+				req.To = time + "Z"
+				if i > 200 {
+					req.Count = 200
+				} else {
+					req.Count = i
+				}
+				idx++
+
 				candlesC <- restapi.GetMinuteCandles(&req, minute)
 			}
 
 		}()
 
 		for candleData := range candlesC {
+			candles := make([]*models.ResMinuteCandles, 0)
 			if err := json.Unmarshal(candleData, &candles); err != nil {
 				return nil, err
 			}
@@ -89,7 +87,7 @@ func CandleGenerator(market string, minute int, count int) (candleC chan *techan
 
 		layout := strings.Split(time.RFC3339, "Z")[0]
 
-		for i := len(data) - 1; i >= 0; i-- {
+		for i := 0; i < len(data); i++ {
 			start, _ := time.Parse(layout, data[i].CandleDateTimeKST)
 			candle := &techan.Candle{
 				Period:     techan.NewTimePeriod(start.Add(-time.Minute), time.Minute),
