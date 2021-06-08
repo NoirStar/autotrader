@@ -13,18 +13,45 @@ import (
 	"github.com/sdcoffey/techan"
 )
 
+// GetCandleData 캔들 리스트 가져옴
 func GetCandleData(market string, minute int, count int) (candleData []*models.ResMinuteCandles, err error) {
 	data := make([]*models.ResMinuteCandles, 0)
+	req := models.ReqMinuteCandles{
+		Market: market,
+		Count:  count,
+	}
+	reqText := restapi.GetMinuteCandles(&req, minute)
+	if err := json.Unmarshal(reqText, &data); err != nil {
+		return nil, err
+	}
+
 	if count <= 200 {
-		req := models.ReqMinuteCandles{
-			Market: market,
-			Count:  count,
-		}
-		reqText := restapi.GetMinuteCandles(&req, minute)
-		if err := json.Unmarshal(reqText, &data); err != nil {
-			return nil, err
-		}
 		return data, nil
+	} else {
+		candlesC := make(chan []*models.ResMinuteCandles)
+		layout := strings.Split(time.RFC3339, "Z")[0]
+
+		go func() {
+			defer close(candlesC)
+			tmp := make([]*models.ResMinuteCandles, 0)
+			start, _ := time.Parse(layout, data[len(data)-1].CandleDateTimeKST)
+
+			for i := 1; i <= int(count/200)+1; i++ {
+				start = start.Add(-time.Minute * time.Duration(count/200))
+				time := start.Format(layout)
+				req.To = time
+				reqText = restapi.GetMinuteCandles(&req, minute)
+				if err := json.Unmarshal(reqText, &tmp); err != nil {
+					return
+				}
+				candlesC <- tmp
+			}
+
+		}()
+
+		data = append(data, <-candlesC...)
+		return data, nil
+
 	}
 }
 
