@@ -3,6 +3,7 @@ package analysis
 import (
 	"encoding/json"
 	"fmt"
+	"sort"
 	"strings"
 	"time"
 
@@ -16,9 +17,14 @@ import (
 // GetCandleData 캔들 리스트 가져옴
 func GetCandleData(market string, minute int, count int) (candleData []*models.ResMinuteCandles, err error) {
 	data := make([]*models.ResMinuteCandles, 0)
+	reqCount := count
+	if count >= 200 {
+		reqCount = 200
+	}
+
 	req := models.ReqMinuteCandles{
 		Market: market,
-		Count:  count,
+		Count:  reqCount,
 	}
 	reqText := restapi.GetMinuteCandles(&req, minute)
 	if err := json.Unmarshal(reqText, &data); err != nil {
@@ -28,28 +34,45 @@ func GetCandleData(market string, minute int, count int) (candleData []*models.R
 	if count <= 200 {
 		return data, nil
 	} else {
-		candlesC := make(chan []*models.ResMinuteCandles)
+		candlesC := make(chan []byte)
+		candles := make([]*models.ResMinuteCandles, 0)
 		layout := strings.Split(time.RFC3339, "Z")[0]
 
 		go func() {
 			defer close(candlesC)
-			tmp := make([]*models.ResMinuteCandles, 0)
-			start, _ := time.Parse(layout, data[len(data)-1].CandleDateTimeKST)
+			start, _ := time.Parse(layout, data[len(data)-1].CandleDateTimeUTC)
+			start = start.Add(-time.Minute * 200)
+			for i := 2; i <= int(count/200+1); i++ {
 
-			for i := 1; i <= int(count/200)+1; i++ {
-				start = start.Add(-time.Minute * time.Duration(count/200))
-				time := start.Format(layout)
-				req.To = time
-				reqText = restapi.GetMinuteCandles(&req, minute)
-				if err := json.Unmarshal(reqText, &tmp); err != nil {
-					return
+				if i == int(count/200)+1 {
+					fmt.Println(-time.Minute * time.Duration(count-(i-1)*200))
+					start = start.Add(-time.Minute - time.Minute*time.Duration(count-(i-1)*200))
+					time := start.Format(layout)
+					req.To = time + "Z"
+					req.Count = count - (i-1)*200
+				} else {
+					start = start.Add(-time.Minute * 200)
+					time := start.Format(layout)
+					req.To = time + "Z"
+					req.Count = 200
 				}
-				candlesC <- tmp
+				fmt.Println(start)
+				candlesC <- restapi.GetMinuteCandles(&req, minute)
 			}
 
 		}()
 
-		data = append(data, <-candlesC...)
+		for candleData := range candlesC {
+			if err := json.Unmarshal(candleData, &candles); err != nil {
+				return nil, err
+			}
+			data = append(data, candles...)
+		}
+
+		sort.Slice(data, func(i, j int) bool {
+			return data[i].Timestamp < data[j].Timestamp
+		})
+
 		return data, nil
 
 	}
@@ -59,16 +82,7 @@ func GetCandleData(market string, minute int, count int) (candleData []*models.R
 func CandleGenerator(market string, minute int, count int) (candleC chan *techan.Candle, err error) {
 	candleC = make(chan *techan.Candle)
 
-	req := models.ReqMinuteCandles{
-		Market: market,
-		Count:  count,
-	}
-	data := make([]*models.ResMinuteCandles, 0)
-
-	reqText := restapi.GetMinuteCandles(&req, minute)
-	if err := json.Unmarshal(reqText, &data); err != nil {
-		return nil, err
-	}
+	data, err := GetCandleData(market, minute, count)
 
 	go func() {
 		defer close(candleC)
