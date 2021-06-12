@@ -12,7 +12,7 @@ func main() {
 	var record *techan.TradingRecord
 	var series *techan.TimeSeries
 
-	candleC, err := analysis.CandleGenerator("KRW-BTC", 1, 2000)
+	candleC, err := analysis.CandleGenerator("KRW-BTC", 5, 1000)
 	utils.CheckErr(err)
 
 	series, record = analysis.RunDynamicStrategy(analysis.CreateRSIStrategy, candleC)
@@ -23,7 +23,7 @@ func main() {
 	fmt.Println("Trade Count : ", tradeCount)
 	fmt.Println("Last Candle Time : ", series.LastCandle().Period.End)
 
-	//
+
 	// data, _ := analysis.GetCandleData("KRW-BTC", 1, 1100)
 	// // analysis.GetCandleData("KRW-BTC", 1, 1100)
 	// for idx, dat := range data {

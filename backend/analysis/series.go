@@ -53,10 +53,8 @@ func GetCandleData(market string, minute int, count int) (candleData []*models.R
 					req.Count = i
 				}
 				idx++
-
 				candlesC <- restapi.GetMinuteCandles(&req, minute)
 			}
-
 		}()
 
 		for candleData := range candlesC {
@@ -70,6 +68,7 @@ func GetCandleData(market string, minute int, count int) (candleData []*models.R
 		sort.Slice(data, func(i, j int) bool {
 			return data[i].Timestamp < data[j].Timestamp
 		})
+
 
 		return data, nil
 
