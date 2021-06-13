@@ -1,4 +1,4 @@
-package models
+package model
 
 // ResTickerWSS 현재가 응답 데이터 포멧
 type ResTickerWSS struct {
@@ -59,16 +59,16 @@ type ResTradeWSS struct {
 
 // ResOrderWSS 체결 응답 데이터 포멧
 type ResOrderWSS struct {
-	Type           string          `json:"type"`            // 타입 : orderbook
-	Code           string          `json:"code"`            // 마켓코드
-	TotalAskSize   float64         `json:"total_ask_size"`  // 호가 매도 총 잔량
-	TotalBidSize   float64         `json:"total_bid_size"`  // 호가 매수 총 잔량
-	OrderbookUnits []OrderBookUnit `json:"orderbook_units"` // 호가
-	Timestamp      int             `json:"timestamp"`       // 타임스탬프 (millisecond)
+	Type           string             `json:"type"`            // 타입 : orderbook
+	Code           string             `json:"code"`            // 마켓코드
+	TotalAskSize   float64            `json:"total_ask_size"`  // 호가 매도 총 잔량
+	TotalBidSize   float64            `json:"total_bid_size"`  // 호가 매수 총 잔량
+	OrderbookUnits []OrderBookUnitWSS `json:"orderbook_units"` // 호가
+	Timestamp      int                `json:"timestamp"`       // 타임스탬프 (millisecond)
 }
 
-// OrderBookUnit 호가 struct
-type OrderBookUnit struct {
+// OrderBookUnitWSS 호가 struct
+type OrderBookUnitWSS struct {
 	AskPrice float64 `json:"ask_price"` // 매도 호가
 	BidPrice float64 `json:"bid_price"` // 매수 호가
 	AskSize  float64 `json:"ask_size"`  // 매도 잔량

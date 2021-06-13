@@ -1,4 +1,4 @@
-package models
+package model
 
 // ReqChance struct 주문 가능 정보
 type ReqChance struct {

@@ -3,8 +3,8 @@ package main
 import (
 	"fmt"
 
-	"github.com/noirstar/autotrading/backend/analysis"
-	"github.com/noirstar/autotrading/backend/utils"
+	"github.com/noirstar/autotrader/analysis"
+	"github.com/noirstar/autotrader/utils"
 	"github.com/sdcoffey/techan"
 )
 

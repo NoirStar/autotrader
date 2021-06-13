@@ -8,25 +8,25 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/noirstar/autotrading/backend/apis/restapi"
-	"github.com/noirstar/autotrading/backend/models"
+	"github.com/noirstar/autotrader/api"
+	"github.com/noirstar/autotrader/model"
 	"github.com/sdcoffey/big"
 	"github.com/sdcoffey/techan"
 )
 
 // GetCandleData 캔들 리스트 가져옴
-func GetCandleData(market string, minute int, count int) (candleData []*models.ResMinuteCandles, err error) {
-	data := make([]*models.ResMinuteCandles, 0)
+func GetCandleData(market string, minute int, count int) (candleData []*model.ResMinuteCandles, err error) {
+	data := make([]*model.ResMinuteCandles, 0)
 	reqCount := count
 	if count >= 200 {
 		reqCount = 200
 	}
 
-	req := models.ReqMinuteCandles{
+	req := model.ReqMinuteCandles{
 		Market: market,
 		Count:  reqCount,
 	}
-	reqText := restapi.GetMinuteCandles(&req, minute)
+	reqText := api.GetMinuteCandles(&req, minute)
 	if err := json.Unmarshal(reqText, &data); err != nil {
 		return nil, err
 	}
@@ -53,12 +53,12 @@ func GetCandleData(market string, minute int, count int) (candleData []*models.R
 					req.Count = i
 				}
 				idx++
-				candlesC <- restapi.GetMinuteCandles(&req, minute)
+				candlesC <- api.GetMinuteCandles(&req, minute)
 			}
 		}()
 
 		for candleData := range candlesC {
-			candles := make([]*models.ResMinuteCandles, 0)
+			candles := make([]*model.ResMinuteCandles, 0)
 			if err := json.Unmarshal(candleData, &candles); err != nil {
 				return nil, err
 			}

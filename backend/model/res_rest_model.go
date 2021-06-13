@@ -1,4 +1,4 @@
-package models
+package model
 
 // ResAccount struct 전체 계좌 조회
 type ResAccount struct {

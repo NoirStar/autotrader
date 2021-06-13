@@ -1,4 +1,4 @@
-package wssapi
+package api
 
 import (
 	"encoding/json"
@@ -6,8 +6,8 @@ import (
 	"net/http"
 
 	"github.com/gorilla/websocket"
-	"github.com/noirstar/autotrading/backend/models"
-	"github.com/noirstar/autotrading/backend/utils"
+	"github.com/noirstar/autotrader/model"
+	"github.com/noirstar/autotrader/utils"
 )
 
 var baseURI string = utils.GetEnv("UPBIT_WSS_BASE_URL")
@@ -35,14 +35,14 @@ func InitWSSClient() {
 	go sendWSMessage(ws, cSendingMsg)
 
 	cd := []string{"KRW-DOGE"}
-	a := models.NewReqForInfo("trade", cd, true)
+	a := model.NewReqForInfoWSS("trade", cd, true)
 	cSendingMsg <- a.ReqForInfoJSON()
 
 	idx := 0
 	for {
 
 		msg := <-cIncomingMsg
-		data := models.ResTradeWSS{}
+		data := model.ResTradeWSS{}
 		err := json.Unmarshal(msg, &data)
 		utils.CheckErr(err)
 

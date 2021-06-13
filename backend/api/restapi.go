@@ -1,4 +1,4 @@
-package restapi
+package api
 
 import (
 	"encoding/json"
@@ -8,8 +8,8 @@ import (
 	"net/url"
 	"strconv"
 
-	"github.com/noirstar/autotrading/backend/models"
-	"github.com/noirstar/autotrading/backend/utils"
+	"github.com/noirstar/autotrader/model"
+	"github.com/noirstar/autotrader/utils"
 )
 
 var baseURL = utils.GetEnv("UPBIT_BASE_URL")
@@ -25,7 +25,7 @@ func GetAccount(accessKey string, secretKey string) []byte {
 }
 
 // GetOrderChance 주문 가능 정보 - 마켓별 주문 가능 정보 확인
-func GetOrderChance(accessKey string, secretKey string, query *models.ReqChance) []byte {
+func GetOrderChance(accessKey string, secretKey string, query *model.ReqChance) []byte {
 
 	reqURL := baseURL + "/v1/orders/chance"
 	queryMap := ConvertStructToMap(query)
@@ -36,7 +36,7 @@ func GetOrderChance(accessKey string, secretKey string, query *models.ReqChance)
 }
 
 // GetOrderSearch 개별 주문 조회 - 주문 UUID 를 통해 개별 주문건을 조회
-func GetOrderSearch(accessKey string, secretKey string, query *models.ReqOrderSearch) []byte {
+func GetOrderSearch(accessKey string, secretKey string, query *model.ReqOrderSearch) []byte {
 
 	reqURL := baseURL + "/v1/order"
 	queryMap := ConvertStructToMap(query)
@@ -47,7 +47,7 @@ func GetOrderSearch(accessKey string, secretKey string, query *models.ReqOrderSe
 }
 
 // GetOrdersSearch 주문 리스트 조회 - 주문 리스트를 조회
-func GetOrdersSearch(accessKey string, secretKey string, query *models.ReqOrdersSearch) []byte {
+func GetOrdersSearch(accessKey string, secretKey string, query *model.ReqOrdersSearch) []byte {
 
 	reqURL := baseURL + "/v1/orders"
 	queryMap := ConvertStructToMap(query)
@@ -58,7 +58,7 @@ func GetOrdersSearch(accessKey string, secretKey string, query *models.ReqOrders
 }
 
 // DeleteOrder 주문 취소 접수 - 주문 UUID를 통해 해당 주문에 대한 취소 접수
-func DeleteOrder(accessKey string, secretKey string, query *models.ReqDeleteOrder) []byte {
+func DeleteOrder(accessKey string, secretKey string, query *model.ReqDeleteOrder) []byte {
 
 	reqURL := baseURL + "/v1/order"
 	queryMap := ConvertStructToMap(query)
@@ -69,7 +69,7 @@ func DeleteOrder(accessKey string, secretKey string, query *models.ReqDeleteOrde
 }
 
 // PostOrder 주문하기
-func PostOrder(accessKey string, secretKey string, query *models.ReqOrders) []byte {
+func PostOrder(accessKey string, secretKey string, query *model.ReqOrders) []byte {
 
 	reqURL := baseURL + "/v1/orders"
 	queryMap := ConvertStructToMap(query)
@@ -88,7 +88,7 @@ func GetMarketCode() []byte {
 }
 
 // GetMinuteCandles 분 캔들 조회
-func GetMinuteCandles(query *models.ReqMinuteCandles, unit int) []byte {
+func GetMinuteCandles(query *model.ReqMinuteCandles, unit int) []byte {
 
 	reqURL := baseURL + "/v1/candles/minutes/" + strconv.Itoa(unit)
 
@@ -96,7 +96,7 @@ func GetMinuteCandles(query *models.ReqMinuteCandles, unit int) []byte {
 }
 
 // GetDayCandles 일 캔들 조회
-func GetDayCandles(query *models.ReqDayCandles) []byte {
+func GetDayCandles(query *model.ReqDayCandles) []byte {
 
 	reqURL := baseURL + "/v1/candles/days"
 
@@ -104,7 +104,7 @@ func GetDayCandles(query *models.ReqDayCandles) []byte {
 }
 
 // GetWeekCandles 주 캔들 조회
-func GetWeekCandles(query *models.ReqWeekCandles) []byte {
+func GetWeekCandles(query *model.ReqWeekCandles) []byte {
 
 	reqURL := baseURL + "/v1/candles/weeks"
 
@@ -112,7 +112,7 @@ func GetWeekCandles(query *models.ReqWeekCandles) []byte {
 }
 
 // GetMonthsCandles 달 캔들 조회
-func GetMonthsCandles(query *models.ReqMonthCandles) []byte {
+func GetMonthsCandles(query *model.ReqMonthCandles) []byte {
 
 	reqURL := baseURL + "/v1/candles/months"
 
