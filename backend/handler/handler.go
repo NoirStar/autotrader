@@ -9,7 +9,7 @@ import (
 // GetIndex Return index.html
 func GetIndex() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		return c.File("public/views/index.html")
+		return c.File("../frontend/index.html")
 	}
 }
 
