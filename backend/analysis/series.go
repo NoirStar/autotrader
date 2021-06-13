@@ -43,7 +43,7 @@ func GetCandleData(market string, minute int, count int) (candleData []*models.R
 			idx := 0
 			for i := count - 200; i > 0; i -= 200 {
 				if idx > 0 {
-					start = start.Add(-time.Minute * 200)
+					start = start.Add(-time.Minute * 200 * time.Duration(minute))
 				}
 				time := start.Format(layout)
 				req.To = time + "Z"
@@ -65,10 +65,13 @@ func GetCandleData(market string, minute int, count int) (candleData []*models.R
 			data = append(data, candles...)
 		}
 
+		// for idx, dat := range data {
+		// 	fmt.Println(idx, ":", dat.CandleDateTimeKST)
+		// }
+
 		sort.Slice(data, func(i, j int) bool {
 			return data[i].Timestamp < data[j].Timestamp
 		})
-
 
 		return data, nil
 
@@ -112,7 +115,7 @@ func RunDynamicStrategy(f DynamicStrategyFunc, candleC chan *techan.Candle) (*te
 		series.AddCandle(candle)
 		if strategy.ShouldEnter(series.LastIndex(), record) {
 			fmt.Println("Enter price:", candle.ClosePrice.FormattedString(0))
-			fmt.Println("Enter Time:", candle.Period.End.Format(time.Kitchen))
+			fmt.Println("Enter Time:", candle.Period.End)
 			record.Operate(techan.Order{
 				Side:          techan.BUY,
 				Security:      uuid,
@@ -122,7 +125,7 @@ func RunDynamicStrategy(f DynamicStrategyFunc, candleC chan *techan.Candle) (*te
 			})
 		} else if record.CurrentPosition().IsLong() && strategy.ShouldExit(series.LastIndex(), record) {
 			fmt.Println("Exit price:", candle.ClosePrice.FormattedString(0))
-			fmt.Println("Exit Time:", candle.Period.End.Format(time.Kitchen))
+			fmt.Println("Exit Time:", candle.Period.End)
 			record.Operate(techan.Order{
 				Side:          techan.SELL,
 				Security:      uuid,

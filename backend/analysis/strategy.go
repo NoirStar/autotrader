@@ -34,21 +34,49 @@ func CreateEMAStrategy(series *techan.TimeSeries) *techan.RuleStrategy {
 	}
 }
 
+// CreateDoubleBollingerStrategy 전략 3분봉 기준
+// 볼린저 35의 하방이 17하방보다 낮아졌다가, 다시 35의 하방이 17하방보다 높아졌을때 진입
+// 탈출은 17 볼린저 밴드를 터치할때?
+func CreateDoubleBollingerStrategy(series *techan.TimeSeries) *techan.RuleStrategy {
+	closePrice := techan.NewClosePriceIndicator(series)
+	bb35Upper := techan.NewBollingerUpperBandIndicator(closePrice, 35, 2)
+	bb35Lower := techan.NewBollingerLowerBandIndicator(closePrice, 35, 2)
+	bb17Upper := techan.NewBollingerUpperBandIndicator(closePrice, 17, 2)
+	bb17Lower := techan.NewBollingerLowerBandIndicator(closePrice, 17, 2)
+
+	return &techan.RuleStrategy{
+		EntryRule: techan.NewCrossUpIndicatorRule(bb17Lower, bb35Lower),
+		// ExitRule: techan.Or(
+		// 	techan.OverIndicatorRule{First: closePrice, Second: bb17Upper},
+		// 	techan.Or(
+		// 		techan.OverIndicatorRule{First: closePrice, Second: bb35Upper},
+		// 		techan.NewCrossDownIndicatorRule(bb35Lower, bb17Lower),
+		// 	),
+		// ),
+		ExitRule: techan.Or(
+			techan.OverIndicatorRule{First: closePrice, Second: bb17Upper},
+			techan.OverIndicatorRule{First: closePrice, Second: bb35Upper},
+		),
+		UnstablePeriod: 15,
+	}
+
+}
+
 // CreateRSIStrategy RSI 전략
 func CreateRSIStrategy(series *techan.TimeSeries) *techan.RuleStrategy {
 	closePrice := techan.NewClosePriceIndicator(series)
-	lowRSI := techan.NewConstantIndicator(40)
-	highRSI := techan.NewConstantIndicator(60)
+	lowRSI := techan.NewConstantIndicator(30)
+	highRSI := techan.NewConstantIndicator(70)
 	rsi := techan.NewRelativeStrengthIndexIndicator(closePrice, 14)
-	ema7 := techan.NewEMAIndicator(closePrice, 9)
+	ma9 := techan.NewSimpleMovingAverage(closePrice, 9)
 
 	return &techan.RuleStrategy{
 		EntryRule: techan.And(
-			techan.UnderIndicatorRule{First: closePrice, Second: ema7},
+			techan.UnderIndicatorRule{First: closePrice, Second: ma9},
 			techan.UnderIndicatorRule{First: rsi, Second: lowRSI},
 		),
 		ExitRule: techan.And(
-			techan.OverIndicatorRule{First: closePrice, Second: ema7},
+			techan.OverIndicatorRule{First: closePrice, Second: ma9},
 			techan.OverIndicatorRule{First: rsi, Second: highRSI},
 		),
 		UnstablePeriod: 15,
@@ -69,14 +97,14 @@ func CreateSimpleRSIStrategy(series *techan.TimeSeries) *techan.RuleStrategy {
 	}
 }
 
-// CreateSimpleEMAStrategy 테스트 전략
-func CreateSimpleEMAStrategy(series *techan.TimeSeries) *techan.RuleStrategy {
+// CreateSimpleMAStrategy 테스트 전략
+func CreateSimpleMAStrategy(series *techan.TimeSeries) *techan.RuleStrategy {
 	closePrice := techan.NewClosePriceIndicator(series)
-	ema7 := techan.NewEMAIndicator(closePrice, 7)
+	ma9 := techan.NewSimpleMovingAverage(closePrice, 9)
 
 	return &techan.RuleStrategy{
-		EntryRule:      techan.NewCrossUpIndicatorRule(closePrice, ema7),
-		ExitRule:       techan.NewCrossDownIndicatorRule(ema7, closePrice),
-		UnstablePeriod: 7,
+		EntryRule:      techan.UnderIndicatorRule{First: closePrice, Second: ma9},
+		ExitRule:       techan.OverIndicatorRule{First: closePrice, Second: ma9},
+		UnstablePeriod: 10,
 	}
 }
