@@ -29,7 +29,7 @@ func main() {
 	router := router.New()
 
 	if debug {
-		router.Logger.Fatal(router.Start(":1323"))
+		router.Logger.Fatal(router.Start(":3000"))
 	}
 
 }

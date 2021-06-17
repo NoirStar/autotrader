@@ -1,6 +1,8 @@
 package router
 
 import (
+	"net/http"
+
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/labstack/gommon/log"
@@ -18,13 +20,27 @@ func New() *echo.Echo {
 
 	e := echo.New()
 	e.Logger.SetLevel(log.DEBUG)
-	e.Use(middleware.Logger())
+
+	// set middleare
+	e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
+		Format:           "time=${time_custom} : method=${method}, uri=${uri}, status=${status}, ip=${remote_ip}\n",
+		CustomTimeFormat: "2006-01-02 15:04:05",
+	}))
+	e.Use(middleware.Recover())
+	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+		AllowOrigins: []string{"http://localhost:8080"},
+		AllowMethods: []string{http.MethodGet, http.MethodPost},
+	}))
+
 	e.Static("/static", staticPath)
 
-	e.GET("/", handler.GetIndex())
-
+	// set routes
 	v1 := e.Group("/api/v1")
+
+	e.GET("/", handler.GetIndex())
 	v1.GET("/candles", handler.GetCandles())
+	v1.POST("/signup", handler.PostRegisterUser())
+	v1.POST("/login", handler.PostLogin())
 
 	return e
 }
