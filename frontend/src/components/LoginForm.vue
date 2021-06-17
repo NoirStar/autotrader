@@ -16,7 +16,6 @@
 </template>
 
 <script>
-import { loginUser } from '@/api/index';
 import { validateEmail } from '@/utils/validation';
 
 export default {
@@ -39,11 +38,12 @@ export default {
           username: this.username,
           password: this.password,
         };
-        const { data } = await loginUser(userData);
-        this.logMessage = `${data}님 로그인 되셨습니다.`;
-        this.initForm();
+        await this.$store.dispatch('LOGIN', userData);
+        this.$router.push('/main');
       } catch (error) {
         console.log(error.response);
+      } finally {
+        this.initForm();
       }
     },
     initForm() {
