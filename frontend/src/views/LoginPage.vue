@@ -1,8 +1,7 @@
 <template>
-  <div>
-    <h1>로그인 페이지</h1>
+  <v-main>
     <LoginForm></LoginForm>
-  </div>
+  </v-main>
 </template>
 
 <script>

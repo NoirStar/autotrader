@@ -1,18 +1,33 @@
 <template>
-  <form @submit.prevent="submitForm">
-    <div>
-      <label for="username">id : </label>
-      <input type="text" id="username" v-model="username" />
-    </div>
-    <div>
-      <label for="password">pw : </label>
-      <input type="text" id="password" v-model="password" />
-    </div>
-    <button :disabled="!isUsernameValid || !password" btype="submit">
-      로그인
-    </button>
-    <p>{{ logMessage }}</p>
-  </form>
+  <v-card elevation="3" outlined class="mx-auto mt-6" max-width="700">
+    <v-card-title>
+      <v-icon large left> mdi-twitter </v-icon>
+      <span class="text-h5">로그인</span>
+    </v-card-title>
+    <v-form @submit.prevent="submitForm">
+      <v-container>
+        <v-row>
+          <v-col>
+            <v-text-field v-model="username" label="아이디" required>
+            </v-text-field>
+          </v-col>
+        </v-row>
+        <v-row>
+          <v-col>
+            <v-text-field v-model="password" label="비밀번호" required>
+            </v-text-field>
+          </v-col>
+        </v-row>
+        <v-btn
+          :self-align="center"
+          :disabled="!isUsernameValid || !password"
+          type="submit"
+        >
+          로그인
+        </v-btn>
+      </v-container>
+    </v-form>
+  </v-card>
 </template>
 
 <script>

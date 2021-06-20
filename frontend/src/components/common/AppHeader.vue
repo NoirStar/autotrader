@@ -1,26 +1,21 @@
 <template>
   <div>
-    <v-app-bar color="teal lighten-3" dense dark>
-      <v-app-bar-nav-icon></v-app-bar-nav-icon>
-
-      <v-toolbar-title>Page title</v-toolbar-title>
+    <v-app-bar color="grey darken-4" dense dark>
+      <router-link class="header-link" to="/">
+        <v-toolbar-title>Tree Autotrader </v-toolbar-title>
+      </router-link>
 
       <v-spacer></v-spacer>
       <template v-if="isLogin">
-        <span>{{ $store.state.username }}</span>
-        <a href="javascript:;" @click="logoutUser">로그아웃</a>
+        <span class="mr-3">{{ $store.state.username }} 님</span>
+        <a href="javascript:;" class="header-link" @click="logoutUser">
+          로그아웃
+        </a>
       </template>
       <template v-else>
-        <router-link to="/login">로그인</router-link> |
-        <router-link to="/signup">회원가입</router-link>
+        <router-link class="header-link mr-3" to="/login">로그인</router-link>
+        <router-link class="header-link" to="/signup">회원가입</router-link>
       </template>
-      <v-btn icon>
-        <v-icon>mdi-heart</v-icon>
-      </v-btn>
-
-      <v-btn icon>
-        <v-icon>mdi-magnify</v-icon>
-      </v-btn>
 
       <v-menu left bottom>
         <template v-slot:activator="{ on, attrs }">
@@ -55,4 +50,13 @@ export default {
 };
 </script>
 
-<style></style>
+<style scoped>
+.header-link {
+  text-decoration: none;
+  color: white;
+}
+
+.header-link:hover {
+  opacity: 0.8;
+}
+</style>

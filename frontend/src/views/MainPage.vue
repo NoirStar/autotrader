@@ -1,11 +1,14 @@
 <template>
-  <div>
-    <h1>Main</h1>
-  </div>
+  <v-main>
+    <CostTable></CostTable>
+  </v-main>
 </template>
 
 <script>
-export default {};
+import CostTable from '@/components/CostTable.vue';
+export default {
+  components: { CostTable },
+};
 </script>
 
 <style></style>
