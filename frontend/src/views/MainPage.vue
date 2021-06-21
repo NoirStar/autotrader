@@ -1,5 +1,5 @@
 <template>
-  <v-main>
+  <v-main class="ma-6">
     <CostTable></CostTable>
   </v-main>
 </template>

@@ -18,11 +18,7 @@
             </v-text-field>
           </v-col>
         </v-row>
-        <v-btn
-          :self-align="center"
-          :disabled="!isUsernameValid || !password"
-          type="submit"
-        >
+        <v-btn :disabled="!isUsernameValid || !password" type="submit">
           로그인
         </v-btn>
       </v-container>
