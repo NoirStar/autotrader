@@ -13,21 +13,28 @@
     </v-card-title>
     <v-data-table
       :headers="headers"
-      :items="$store.state.coinInfo"
+      :items="coinInfo"
       :search="search"
-      item-key="market"
+      item-key="price"
     >
       <template class="d-flex flex-row" v-slot:[`item.korean_name`]="{ item }">
         <div>
           <img
             class="coin-logo"
-            :src="`https://static.upbit.com/logos/${item.market}.png`"
+            :src="`https://static.upbit.com/logos/${item.marketShort}.png`"
           />
           {{ item.korean_name }}
         </div>
         <div>
-          <small> {{ item.market }}</small>
+          <small> {{ item.marketShort }}</small>
         </div>
+      </template>
+
+      <template v-slot:[`item.price`]="{ item }">
+        {{ item.price.toLocaleString() }}
+      </template>
+      <template v-slot:[`item.changeRate`]="{ item }">
+        <div>{{ (item.changeRate * 100).toFixed(2) }}%</div>
       </template>
     </v-data-table>
   </v-card>
@@ -37,7 +44,11 @@
 export default {
   data() {
     return {
+      conn: null,
       search: '',
+      reqFormat: [],
+      codes: [],
+      coinInfo: [],
       headers: [
         {
           text: '코인',
@@ -46,7 +57,7 @@ export default {
         },
         {
           text: '현재가',
-          value: '',
+          value: 'price',
         },
         {
           text: '김프',
@@ -54,20 +65,59 @@ export default {
         },
         {
           text: '전일대비',
-          value: '',
+          value: 'changeRate',
+        },
+        {
+          text: '고가대비(52주)',
+          value: 'highest52',
+        },
+        {
+          text: '저가대비(52주)',
+          value: 'lowest52',
+        },
+        {
+          text: '거래액(일)',
+          value: 'accTradePrice',
         },
       ],
     };
   },
-  methods: {},
-  computed: {
-    parseCoinName(market) {
-      return market.substr(3);
+  methods: {
+    MakeCodes() {
+      return this.$store.state.coinInfo.reduce(
+        (acc, cur) => (acc.push(`"${cur.market}"`), acc),
+        [],
+      );
     },
   },
+  computed: {},
   async created() {
-    const data = await this.$store.dispatch('COININFO');
-    console.log(data);
+    await this.$store.dispatch('COININFO');
+    this.coinInfo = this.$store.state.coinInfo;
+    const conn = await this.$store.dispatch('CONNECTION');
+    conn.onmessage = ({ data }) => {
+      if (data instanceof Blob) {
+        let reader = new FileReader();
+        reader.onload = () => {
+          let result = JSON.parse(reader.result);
+          this.coinInfo.forEach(e => {
+            if (e.market === result.cd) {
+              this.$set(e, 'price', result.tp);
+              this.$set(e, 'changePrice', result.scp);
+              this.$set(e, 'changeRate', result.scr);
+              this.$set(e, 'accTradePrice', result.atp24h);
+              this.$set(e, 'askBid', result.ab);
+              this.$set(e, 'highest52', result.h52wp);
+              this.$set(e, 'lowest52', result.l52wp);
+            }
+          });
+        };
+        reader.readAsText(data);
+      }
+    };
+    conn.send(
+      `[{"ticket":"tree"},{"type":"ticker","codes":[${this.MakeCodes()}]},{"format":"SIMPLE"}]`,
+    );
   },
 };
 </script>
