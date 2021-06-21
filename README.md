@@ -4,7 +4,38 @@
 ![Go](https://img.shields.io/github/go-mod/go-version/noirstar/autotrader?filename=backend%252Fgo.mod)
 ![Vue](https://img.shields.io/npm/v/vue)
 
-> Check Cryptocurrency prices and Autotrade Webservice
+> 업비트 시세 수신 및 오토트레이딩 (개발중)
+
+## Introduce
+
+A Golang HTTP server / Vue.js web application for autotrading
+ 
+**Build info and requirements**
+
+Built using Go 1.16.3 and Vue CLI 3
+
+Build tools used:
+- Vue CLI 
+- NPM
+- Golang 1.16+
+
+**List of URL routes**
+
+Backend
+
+URL Path | Request Type |Purpose
+:-----:|:-----: |:-----:
+`/candles`|GET|Get candle data
+`/coins`|GET|Get coin info
+`/signup`|POST|Register User
+`/login`|POST|Login User
+
+Frontend
+
+URL Path | Request Type |Purpose
+:-----:|:-----: |:-----:
+`/`|GET|Main frontend
+
 
 ## Installation
 
