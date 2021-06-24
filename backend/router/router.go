@@ -6,17 +6,12 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/labstack/gommon/log"
+	"github.com/noirstar/autotrader/db"
 	"github.com/noirstar/autotrader/handler"
 )
 
 // New Initalize Webserver
 func New() *echo.Echo {
-
-	const (
-		indexPath   string = "public/views/index.html"
-		faviconPath string = "public/favicon.ico"
-		staticPath  string = "public/static"
-	)
 
 	e := echo.New()
 	e.Logger.SetLevel(log.DEBUG)
@@ -32,7 +27,10 @@ func New() *echo.Echo {
 		AllowMethods: []string{http.MethodGet, http.MethodPost},
 	}))
 
-	e.Static("/static", staticPath)
+	e.Static("/static", "public/views/index.html")
+
+	// connect db
+	db.New()
 
 	// set routes
 	v1 := e.Group("/api/v1")

@@ -18,6 +18,7 @@ Build tools used:
 - Vue CLI 
 - NPM
 - Golang 1.16+
+- MongoDB Cloud
 
 **List of URL routes**
 
