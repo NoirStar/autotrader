@@ -6,17 +6,18 @@ import (
 	"log"
 	"time"
 
+	"github.com/noirstar/autotrader/model"
 	"github.com/noirstar/autotrader/utils"
-	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
 )
 
+// Connection mongo db connection struct
 type Connection struct {
-	client *mongo.Client
-	ctx    context.Context
-	cancel context.CancelFunc
+	Client *mongo.Client
+	Ctx    context.Context
+	Cancel context.CancelFunc
 }
 
 // New makes new connection with mongodb
@@ -35,31 +36,25 @@ func New() *Connection {
 	if err != nil {
 		log.Fatal(err)
 	}
-	return client
+	return &Connection{
+		Client: client,
+		Ctx:    ctx,
+		Cancel: cancel,
+	}
 }
 
 // CreateUser creates users
-func CreateUser(client *mongo.Client) {
-	collection := client.Database("autotrader").Collection("users")
+func (c *Connection) CreateUser(user *model.User) {
+	collection := c.Client.Database("autotrader").Collection("users")
 
-	res, insertErr := collection.InsertMany(ctx, docs)
-	if insertErr != nil {
-		log.Fatal(insertErr)
+	defer c.Client.Disconnect(c.Ctx)
+	defer c.Cancel()
+
+	res, err := collection.InsertOne(c.Ctx, user)
+	if err != nil {
+		log.Fatal(err)
 	}
+
 	fmt.Println(res)
-	/*
-		Iterate a cursor and print it
-	*/
-	cur, currErr := collection.Find(ctx, bson.D{})
 
-	if currErr != nil {
-		panic(currErr)
-	}
-	defer cur.Close(ctx)
-
-	var posts []Post
-	if err = cur.All(ctx, &posts); err != nil {
-		panic(err)
-	}
-	fmt.Println(posts)
 }
