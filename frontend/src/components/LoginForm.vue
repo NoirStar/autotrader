@@ -1,26 +1,34 @@
 <template>
-  <v-card elevation="3" outlined class="mx-auto mt-6" max-width="700">
-    <v-card-title>
-      <v-icon large left> mdi-twitter </v-icon>
-      <span class="text-h5">로그인</span>
+  <v-card elevation="3" outlined class="mx-auto mt-16" max-width="700">
+    <v-card-title class="justify-center">
+      <span class="text-h3 my-10">Autotrader</span>
     </v-card-title>
     <v-form @submit.prevent="submitForm">
       <v-container>
-        <v-row>
-          <v-col>
+        <v-row justify="center">
+          <v-col cols="9">
             <v-text-field v-model="username" label="아이디" required>
             </v-text-field>
           </v-col>
         </v-row>
-        <v-row>
-          <v-col>
+        <v-row justify="center">
+          <v-col cols="9">
             <v-text-field v-model="password" label="비밀번호" required>
             </v-text-field>
           </v-col>
         </v-row>
-        <v-btn :disabled="!isUsernameValid || !password" type="submit">
-          로그인
-        </v-btn>
+        <v-row class="my-10" justify="center">
+          <v-col cols="7">
+            <v-btn
+              large
+              block
+              :disabled="!isUsernameValid || !password"
+              type="submit"
+            >
+              로그인
+            </v-btn>
+          </v-col>
+        </v-row>
       </v-container>
     </v-form>
   </v-card>

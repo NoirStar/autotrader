@@ -4,4 +4,12 @@ function validateEmail(email) {
   return re.test(String(email).toLowerCase());
 }
 
-export { validateEmail };
+function validatePassword(pw) {
+  const symbol = /[`~!@#$%^&*\\'";:?]/;
+  const eng = /[a-zA-Z]/;
+  const num = /[0-9]/;
+
+  return symbol.test(pw) && eng.test(pw) && num.test(pw);
+}
+
+export { validateEmail, validatePassword };

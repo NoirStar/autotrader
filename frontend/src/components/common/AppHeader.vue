@@ -13,7 +13,7 @@
         </a>
       </template>
       <template v-else>
-        <router-link class="header-link mr-3" to="/login">로그인</router-link>
+        <router-link class="header-link mr-3" to="/login"> 로그인 </router-link>
         <router-link class="header-link" to="/signup">회원가입</router-link>
       </template>
 
@@ -23,12 +23,6 @@
             <v-icon>mdi-dots-vertical</v-icon>
           </v-btn>
         </template>
-
-        <v-list>
-          <v-list-item v-for="n in 5" :key="n" @click="() => {}">
-            <v-list-item-title>Option {{ n }}</v-list-item-title>
-          </v-list-item>
-        </v-list>
       </v-menu>
     </v-app-bar>
   </div>
@@ -53,10 +47,15 @@ export default {
 <style scoped>
 .header-link {
   text-decoration: none;
-  color: white;
+  color: #b2c0cc;
+  font-weight: 500;
+  transition-delay: initial;
+  transition-duration: 0.08s;
+  transition-property: all;
+  transition-timing-function: ease-in-out;
 }
 
 .header-link:hover {
-  opacity: 0.8;
+  color: white;
 }
 </style>
