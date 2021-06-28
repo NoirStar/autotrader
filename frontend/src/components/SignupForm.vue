@@ -57,6 +57,7 @@
               <v-text-field
                 v-model="email"
                 :rules="emailRules"
+                @blur="checkDuplicateEmail"
                 label="이메일"
                 clearable
                 required
@@ -69,6 +70,7 @@
               <v-text-field
                 :rules="nickRules"
                 v-model="nickname"
+                @blur="checkDuplicateNickname"
                 label="닉네임"
                 clearable
                 required
@@ -154,7 +156,7 @@ export default {
       idRules: [
         v => !!v || '아이디를 입력해주세요',
         v => (v && v.length <= 12) || '아이디는 12자 이내여야 합니다',
-        !this.isDuplicateID || '테스트',
+        () => !this.isDuplicateID || '이미 사용중인 아이디 입니다',
       ],
       pwRules: [
         v => !!v || '비밀번호를 입력해주세요',
@@ -170,9 +172,13 @@ export default {
       emailRules: [
         v => !!v || '이메일을 입력해주세요',
         v => validateEmail(v) || '이메일 형식을 확인해 주세요',
+        () => !this.isDuplicateEmail || '이미 사용중인 이메일 입니다',
       ],
       birthRules: [v => !!v || '생년월일을 입력해주세요'],
-      nickRules: [v => !!v || '닉네임을 입력해주세요'],
+      nickRules: [
+        v => !!v || '닉네임을 입력해주세요',
+        () => !this.isDuplicateNickname || '이미 사용중인 닉네임 입니다',
+      ],
       logMessage: '',
     };
   },
@@ -183,40 +189,50 @@ export default {
   },
   methods: {
     async submitForm() {
-      try {
+      if (
+        this.isDuplicateID ||
+        this.isDuplicateEmail ||
+        this.isDuplicateNickname
+      ) {
         this.validateForm();
-        const userData = {
-          id: this.id,
-          pw: this.pw,
-          email: this.email,
-          nickname: this.nickname,
-          birth: this.birth,
-        };
-        const { data } = await registerUser(userData);
+      } else {
+        try {
+          this.validateForm();
+          const userData = {
+            id: this.id,
+            pw: this.pw,
+            email: this.email,
+            nickname: this.nickname,
+            birth: this.birth,
+          };
+          const { data } = await registerUser(userData);
 
-        this.logMessage = `${data}님 환영합니다`;
-        this.resetForm();
-        this.resetValidation();
-        this.snackbar = true;
-      } catch (error) {
-        this.logMessage = error.response.data;
-        this.snackbar = true;
+          this.logMessage = `${data}님 환영합니다`;
+          this.resetForm();
+          this.resetValidation();
+          this.snackbar = true;
+          await this.$store.dispatch('LOGIN', {
+            id: userData.id,
+            pw: userData.pw,
+          });
+          this.$router.push('/main');
+        } catch (error) {
+          this.logMessage = error.response.data;
+          this.snackbar = true;
+        }
       }
     },
     async checkDuplicateID() {
       const { data } = await checkDuplicate({ id: this.id });
-      if (data === true) {
-        this.isDuplicateID = true;
-      }
-      this.validateForm();
+      this.isDuplicateID = data === true ? true : false;
     },
     async checkDuplicateEmail() {
       const { data } = await checkDuplicate({ email: this.email });
-      return data == 'true' ? true : false;
+      this.isDuplicateEmail = data === true ? true : false;
     },
     async checkDuplicateNickname() {
       const { data } = await checkDuplicate({ nickname: this.nickname });
-      return data == 'true' ? true : false;
+      this.isDuplicateNickname = data === true ? true : false;
     },
     validateForm() {
       this.$refs.form.validate();
