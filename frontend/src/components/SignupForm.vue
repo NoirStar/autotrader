@@ -15,6 +15,7 @@
                 label="아이디"
                 :rules="idRules"
                 :counter="12"
+                @blur="checkDuplicateID"
                 required
               >
               </v-text-field>
@@ -133,7 +134,7 @@
 </template>
 
 <script>
-import { registerUser } from '@/api/index';
+import { registerUser, checkDuplicate } from '@/api/index';
 import { validateEmail, validatePassword } from '@/utils/validation';
 
 export default {
@@ -141,6 +142,9 @@ export default {
     return {
       snackbar: false,
       passwordShow: false,
+      isDuplicateID: false,
+      isDuplicateEmail: false,
+      isDuplicateNickname: false,
       id: '',
       pw: '',
       pwCopy: '',
@@ -150,6 +154,7 @@ export default {
       idRules: [
         v => !!v || '아이디를 입력해주세요',
         v => (v && v.length <= 12) || '아이디는 12자 이내여야 합니다',
+        !this.isDuplicateID || '테스트',
       ],
       pwRules: [
         v => !!v || '비밀번호를 입력해주세요',
@@ -197,6 +202,21 @@ export default {
         this.logMessage = error.response.data;
         this.snackbar = true;
       }
+    },
+    async checkDuplicateID() {
+      const { data } = await checkDuplicate({ id: this.id });
+      if (data === true) {
+        this.isDuplicateID = true;
+      }
+      this.validateForm();
+    },
+    async checkDuplicateEmail() {
+      const { data } = await checkDuplicate({ email: this.email });
+      return data == 'true' ? true : false;
+    },
+    async checkDuplicateNickname() {
+      const { data } = await checkDuplicate({ nickname: this.nickname });
+      return data == 'true' ? true : false;
     },
     validateForm() {
       this.$refs.form.validate();

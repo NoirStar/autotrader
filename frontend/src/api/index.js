@@ -12,4 +12,8 @@ function loginUser(userData) {
   return commonInst.post('login', userData);
 }
 
-export { registerUser, loginUser };
+function checkDuplicate(data) {
+  return commonInst.post('check', data);
+}
+
+export { registerUser, loginUser, checkDuplicate };

@@ -75,3 +75,29 @@ func CreateUser(user *model.User) error {
 	}
 	return errCreateUser
 }
+
+// CheckDuplicate checks duplication
+func CheckDuplicate(params map[string]string) (bool, error) {
+	client, ctx, cancel, err := New()
+	if err != nil {
+		return false, err
+	}
+
+	defer client.Disconnect(ctx)
+	defer cancel()
+
+	collection := client.Database("autotrader").Collection("users")
+
+	for key, val := range params {
+		filter := bson.M{key: val}
+		num, err := collection.CountDocuments(ctx, filter)
+		if err != nil {
+			return false, err
+		}
+
+		if num > 0 {
+			return true, nil
+		}
+	}
+	return false, nil
+}

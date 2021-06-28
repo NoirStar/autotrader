@@ -38,6 +38,7 @@ func New() *echo.Echo {
 	e.GET("/", handler.GetIndex())
 	v1.GET("/candles", handler.GetCandles())
 	v1.GET("/coins", handler.GetCoinInfo())
+	v1.POST("/check", handler.PostCheck())
 	v1.POST("/signup", handler.PostRegisterUser())
 	v1.POST("/login", handler.PostLogin())
 

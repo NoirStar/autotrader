@@ -80,3 +80,25 @@ func PostLogin() echo.HandlerFunc {
 		return c.JSON(http.StatusOK, params["username"])
 	}
 }
+
+// PostCheck 중복값 검사 핸들러
+func PostCheck() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		params := make(map[string]string)
+		err := c.Bind(&params)
+		if err != nil {
+			fmt.Println(err)
+			return c.String(http.StatusInternalServerError, "파라미터 바인딩에 실패했습니다")
+		}
+		if len(params) > 1 {
+			return c.String(http.StatusBadRequest, "잘못된 요청입니다")
+		}
+
+		check, err := db.CheckDuplicate(params)
+
+		if check {
+			return c.String(http.StatusOK, "true")
+		}
+		return c.String(http.StatusOK, "false")
+	}
+}
