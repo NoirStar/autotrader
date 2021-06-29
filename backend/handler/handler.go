@@ -76,8 +76,28 @@ func PostLogin() echo.HandlerFunc {
 		err := c.Bind(&params)
 		if err != nil {
 			fmt.Println(err)
+			return c.String(http.StatusInternalServerError, "파라미터 바인딩에 실패했습니다")
 		}
-		return c.JSON(http.StatusOK, params["username"])
+
+		if len(params) != 2 {
+			return c.String(http.StatusBadRequest, "잘못된 요청입니다")
+		}
+
+		user := &model.User{
+			ID:       params["id"],
+			PW:       params["pw"],
+			Email:    params["email"],
+			Nickname: params["nickname"],
+			Birth:    params["birth"],
+			Level:    1,
+			Money:    10000000,
+		}
+		err = db.CreateUser(user)
+		if err != nil {
+			fmt.Println(err)
+			return c.String(http.StatusInternalServerError, "회원가입에 실패했습니다")
+		}
+		return c.String(http.StatusOK, params["nickname"])
 	}
 }
 

@@ -16,6 +16,7 @@ import (
 
 var (
 	errCreateUser error = errors.New("DB Error : CreateUser")
+	errLoginUser  error = errors.New("DB Error : LoginUser")
 )
 
 // New makes new connection with mongodb
@@ -74,6 +75,32 @@ func CreateUser(user *model.User) error {
 		return nil
 	}
 	return errCreateUser
+}
+
+// LoginUser login users
+func LoginUser(id, pw string) error {
+	client, ctx, cancel, err := New()
+	if err != nil {
+		return err
+	}
+	collection := client.Database("autotrader").Collection("users")
+	var result bson.M
+
+	defer client.Disconnect(ctx)
+	defer cancel()
+
+	filter := bson.M{
+		"$and": []bson.M{
+			bson.M{"id": id},
+			bson.M{"pw": pw},
+		},
+	}
+
+	err = collection.FindOne(ctx, filter).Decode(&result)
+	if err != nil {
+		return err
+	}
+	return errLoginUser
 }
 
 // CheckDuplicate checks duplication
