@@ -7,7 +7,7 @@
 
       <v-spacer></v-spacer>
       <template v-if="isLogin">
-        <span class="mr-3">{{ $store.state.username }} 님</span>
+        <span class="mr-3">{{ $store.state.nickname }} 님</span>
         <a href="javascript:;" class="header-link" @click="logoutUser">
           로그아웃
         </a>
@@ -37,7 +37,7 @@ export default {
   },
   methods: {
     logoutUser() {
-      this.$store.commit('clearUsername');
+      this.$store.commit('clearNickname');
       this.$router.push('/login');
     },
   },

@@ -15,7 +15,9 @@
       :headers="headers"
       :items="coinInfo"
       :search="search"
-      item-key="price"
+      :disable-pagination="true"
+      :hide-default-footer="true"
+      item-key="korean_name"
     >
       <template class="d-flex flex-row" v-slot:[`item.korean_name`]="{ item }">
         <div>
@@ -29,12 +31,43 @@
           <small> {{ item.marketShort }}</small>
         </div>
       </template>
-
       <template v-slot:[`item.price`]="{ item }">
-        {{ item.price.toLocaleString() }}
+        <template v-if="item.changeRate >= 0">
+          <template v-if="item.askBid == 'ASK'">
+            <div class="price-up bold price-border-ask">
+              {{ convertPrice(item.price) }}
+            </div>
+          </template>
+          <template v-else>
+            <div class="price-up bold price-border-bid">
+              {{ convertPrice(item.price) }}
+            </div>
+          </template>
+        </template>
+        <template v-else>
+          <div class="price-down bold">{{ convertPrice(item.price) }}</div>
+        </template>
       </template>
+
       <template v-slot:[`item.changeRate`]="{ item }">
-        <div>{{ (item.changeRate * 100).toFixed(2) }}%</div>
+        <template v-if="item.changeRate >= 0">
+          <div class="price-up">+{{ convertChangeRate(item.changeRate) }}%</div>
+        </template>
+        <template v-else>
+          <div class="price-down">
+            -{{ convertChangeRate(item.changeRate) }}%
+          </div>
+        </template>
+      </template>
+
+      <template v-slot:[`item.highest52`]="{ item }">
+        {{ convertPrice(item.highest52) }}
+      </template>
+      <template v-slot:[`item.lowest52`]="{ item }">
+        {{ convertPrice(item.lowest52) }}
+      </template>
+      <template v-slot:[`item.accTradePrice`]="{ item }">
+        {{ convertAccPrice(item.accTradePrice) }} 백만
       </template>
     </v-data-table>
   </v-card>
@@ -83,11 +116,20 @@ export default {
     };
   },
   methods: {
-    MakeCodes() {
+    makeCodes() {
       return this.$store.state.coinInfo.reduce(
         (acc, cur) => (acc.push(`"${cur.market}"`), acc),
         [],
       );
+    },
+    convertPrice(price) {
+      return price.toLocaleString();
+    },
+    convertAccPrice(price) {
+      return Math.floor(price / 1000000).toLocaleString();
+    },
+    convertChangeRate(changeRate) {
+      return (changeRate * 100).toFixed(2);
     },
   },
   computed: {},
@@ -116,7 +158,7 @@ export default {
       }
     };
     conn.send(
-      `[{"ticket":"tree"},{"type":"ticker","codes":[${this.MakeCodes()}]},{"format":"SIMPLE"}]`,
+      `[{"ticket":"tree"},{"type":"ticker","codes":[${this.makeCodes()}]},{"format":"SIMPLE"}]`,
     );
   },
 };
@@ -125,5 +167,65 @@ export default {
 <style scoped>
 .coin-logo {
   width: 0.775rem;
+}
+
+.price-up {
+  color: #f06d6f;
+}
+
+.price-down {
+  color: #4480da;
+}
+
+.bold {
+  font-weight: 600;
+}
+
+.price-border-ask {
+  border: 0.5px solid rgba(0, 0, 0, 0);
+  animation: blink-ask 0.5s;
+  -webkit-animation: blink-ask 0.5s;
+}
+
+.price-border-bid {
+  border: 0.5px solid rgba(0, 0, 0, 0);
+  animation: blink-bid 0.5s;
+  -webkit-animation: blink-bid 0.5s;
+}
+
+@keyframes blink-ask {
+  0% {
+    border: 0.5px solid rgba(240, 109, 111, 0);
+  }
+  100% {
+    border: 0.5px solid rgba(240, 109, 111, 1);
+  }
+}
+
+@-webkit-keyframes blink-ask {
+  0% {
+    border: 0.5px solid rgba(240, 109, 111, 0);
+  }
+  100% {
+    border: 0.5px solid rgba(240, 109, 111, 1);
+  }
+}
+
+@keyframes blink-bid {
+  0% {
+    border: 0.5px solid rgba(240, 109, 111, 0);
+  }
+  100% {
+    border: 0.5px solid rgba(68, 128, 218, 1);
+  }
+}
+
+@-webkit-keyframes blink-bid {
+  0% {
+    border: 0.5px solid rgba(240, 109, 111, 0);
+  }
+  100% {
+    border: 0.5px solid rgba(68, 128, 218, 1);
+  }
 }
 </style>

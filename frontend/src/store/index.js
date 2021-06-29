@@ -8,21 +8,21 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
-    username: '',
+    nickname: '',
     socketConn: null,
     coinInfo: [],
   },
   getters: {
     isLogin(state) {
-      return state.username !== '';
+      return state.nickname !== '';
     },
   },
   mutations: {
-    setUsername(state, username) {
-      state.username = username;
+    setNickname(state, nickname) {
+      state.nickname = nickname;
     },
-    clearUsername(state) {
-      state.username = '';
+    clearNickname(state) {
+      state.nickname = '';
     },
     setCoinInfo(state, data) {
       state.coinInfo = data.filter(e => {
@@ -39,7 +39,7 @@ export default new Vuex.Store({
   actions: {
     async LOGIN({ commit }, userData) {
       const { data } = await loginUser(userData);
-      commit('setUsername', data);
+      commit('setNickname', data);
       return data;
     },
     async COININFO({ commit }) {

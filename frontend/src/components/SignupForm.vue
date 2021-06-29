@@ -115,7 +115,14 @@
           </v-row>
           <v-row class="my-10" justify="center">
             <v-col cols="7">
-              <v-btn :disabled="!isFormValid" large block type="submit">
+              <v-btn
+                :disabled="!isFormValid || loading"
+                :loading="loading"
+                color="primary"
+                large
+                block
+                type="submit"
+              >
                 회원가입
               </v-btn>
             </v-col>
@@ -147,6 +154,7 @@ export default {
       isDuplicateID: false,
       isDuplicateEmail: false,
       isDuplicateNickname: false,
+      loading: false,
       id: '',
       pw: '',
       pwCopy: '',
@@ -205,16 +213,17 @@ export default {
             nickname: this.nickname,
             birth: this.birth,
           };
+          this.loading = true;
           const { data } = await registerUser(userData);
-
           this.logMessage = `${data}님 환영합니다`;
           this.resetForm();
           this.resetValidation();
-          this.snackbar = true;
+          this.loading = false;
           await this.$store.dispatch('LOGIN', {
             id: userData.id,
             pw: userData.pw,
           });
+          this.snackbar = true;
           this.$router.push('/main');
         } catch (error) {
           this.logMessage = error.response.data;
