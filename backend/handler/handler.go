@@ -9,6 +9,7 @@ import (
 	"github.com/noirstar/autotrader/api"
 	"github.com/noirstar/autotrader/db"
 	"github.com/noirstar/autotrader/model"
+	"golang.org/x/crypto/bcrypt"
 )
 
 // GetIndex Return index.html
@@ -51,9 +52,15 @@ func PostRegisterUser() echo.HandlerFunc {
 			return c.String(http.StatusBadRequest, "잘못된 요청입니다")
 		}
 
+		pwHash, err := bcrypt.GenerateFromPassword([]byte(params["pw"]), bcrypt.DefaultCost)
+		if err != nil {
+			fmt.Println(err)
+			return c.String(http.StatusInternalServerError, "패스워드 해싱에 실패했습니다")
+		}
+
 		user := &model.User{
 			ID:       params["id"],
-			PW:       params["pw"],
+			PW:       string(pwHash),
 			Email:    params["email"],
 			Nickname: params["nickname"],
 			Birth:    params["birth"],
@@ -83,21 +90,12 @@ func PostLogin() echo.HandlerFunc {
 			return c.String(http.StatusBadRequest, "잘못된 요청입니다")
 		}
 
-		user := &model.User{
-			ID:       params["id"],
-			PW:       params["pw"],
-			Email:    params["email"],
-			Nickname: params["nickname"],
-			Birth:    params["birth"],
-			Level:    1,
-			Money:    10000000,
-		}
-		err = db.CreateUser(user)
+		user, err := db.LoginUser(params["id"], params["pw"])
 		if err != nil {
 			fmt.Println(err)
-			return c.String(http.StatusInternalServerError, "회원가입에 실패했습니다")
+			return c.String(http.StatusInternalServerError, "아이디 혹은 패스워드가 일치하지 않습니다")
 		}
-		return c.String(http.StatusOK, params["nickname"])
+		return c.String(http.StatusOK, user.Nickname)
 	}
 }
 

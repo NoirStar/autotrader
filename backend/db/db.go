@@ -12,6 +12,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
+	"golang.org/x/crypto/bcrypt"
 )
 
 var (
@@ -78,29 +79,29 @@ func CreateUser(user *model.User) error {
 }
 
 // LoginUser login users
-func LoginUser(id, pw string) error {
+func LoginUser(id, pw string) (*model.User, error) {
 	client, ctx, cancel, err := New()
 	if err != nil {
-		return err
+		return nil, err
 	}
 	collection := client.Database("autotrader").Collection("users")
-	var result bson.M
+	var result *model.User
 
 	defer client.Disconnect(ctx)
 	defer cancel()
 
-	filter := bson.M{
-		"$and": []bson.M{
-			bson.M{"id": id},
-			bson.M{"pw": pw},
-		},
-	}
+	filter := bson.M{"id": id}
 
 	err = collection.FindOne(ctx, filter).Decode(&result)
-	if err != nil {
-		return err
+	if err == mongo.ErrNoDocuments {
+		return nil, errLoginUser
 	}
-	return errLoginUser
+	err = bcrypt.CompareHashAndPassword([]byte(result.PW), []byte(pw))
+	if err != nil {
+		return nil, errLoginUser
+	}
+
+	return result, nil
 }
 
 // CheckDuplicate checks duplication
