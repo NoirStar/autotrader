@@ -18,7 +18,7 @@ var baseURL = utils.GetEnv("UPBIT_BASE_URL")
 func GetAccount(accessKey string, secretKey string) []byte {
 
 	reqURL := baseURL + "/v1/accounts"
-	tokenString, err := utils.GetJwtToken(accessKey, secretKey)
+	tokenString, err := utils.CreateUpbitJwt(accessKey, secretKey)
 	utils.CheckErr(err)
 
 	return RequestToServer(reqURL, "GET", tokenString, nil)
@@ -29,7 +29,7 @@ func GetOrderChance(accessKey string, secretKey string, query *model.ReqChance) 
 
 	reqURL := baseURL + "/v1/orders/chance"
 	queryMap := ConvertStructToMap(query)
-	tokenString, err := utils.GetJwtTokenWithQuery(accessKey, secretKey, queryMap)
+	tokenString, err := utils.CreateUpbitJwtQuery(accessKey, secretKey, queryMap)
 	utils.CheckErr(err)
 
 	return RequestToServer(reqURL, "GET", tokenString, queryMap)
@@ -40,7 +40,7 @@ func GetOrderSearch(accessKey string, secretKey string, query *model.ReqOrderSea
 
 	reqURL := baseURL + "/v1/order"
 	queryMap := ConvertStructToMap(query)
-	tokenString, err := utils.GetJwtTokenWithQuery(accessKey, secretKey, queryMap)
+	tokenString, err := utils.CreateUpbitJwtQuery(accessKey, secretKey, queryMap)
 	utils.CheckErr(err)
 
 	return RequestToServer(reqURL, "GET", tokenString, queryMap)
@@ -51,7 +51,7 @@ func GetOrdersSearch(accessKey string, secretKey string, query *model.ReqOrdersS
 
 	reqURL := baseURL + "/v1/orders"
 	queryMap := ConvertStructToMap(query)
-	tokenString, err := utils.GetJwtTokenWithQuery(accessKey, secretKey, queryMap)
+	tokenString, err := utils.CreateUpbitJwtQuery(accessKey, secretKey, queryMap)
 	utils.CheckErr(err)
 
 	return RequestToServer(reqURL, "GET", tokenString, queryMap)
@@ -62,7 +62,7 @@ func DeleteOrder(accessKey string, secretKey string, query *model.ReqDeleteOrder
 
 	reqURL := baseURL + "/v1/order"
 	queryMap := ConvertStructToMap(query)
-	tokenString, err := utils.GetJwtTokenWithQuery(accessKey, secretKey, queryMap)
+	tokenString, err := utils.CreateUpbitJwtQuery(accessKey, secretKey, queryMap)
 	utils.CheckErr(err)
 
 	return RequestToServer(reqURL, "DELETE", tokenString, queryMap)
@@ -73,7 +73,7 @@ func PostOrder(accessKey string, secretKey string, query *model.ReqOrders) []byt
 
 	reqURL := baseURL + "/v1/orders"
 	queryMap := ConvertStructToMap(query)
-	tokenString, err := utils.GetJwtTokenWithQuery(accessKey, secretKey, queryMap)
+	tokenString, err := utils.CreateUpbitJwtQuery(accessKey, secretKey, queryMap)
 	utils.CheckErr(err)
 
 	return RequestToServer(reqURL, "POST", tokenString, queryMap)

@@ -3,14 +3,17 @@ package utils
 import (
 	"crypto/sha512"
 	"fmt"
+	"net/http"
 	"net/url"
+	"time"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/google/uuid"
+	"github.com/labstack/echo/v4"
 )
 
-// GetJwtToken jwt token 생성
-func GetJwtToken(accessKey string, secretKey string) (string, error) {
+// CreateUpbitJwt jwt token 생성
+func CreateUpbitJwt(accessKey string, secretKey string) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"access_key": accessKey,
 		"nonce":      uuid.New(),
@@ -22,8 +25,8 @@ func GetJwtToken(accessKey string, secretKey string) (string, error) {
 	return tokenString, nil
 }
 
-// GetJwtTokenWithQuery jwt token 생성 (쿼리값 포함)
-func GetJwtTokenWithQuery(accessKey string, secretKey string, query map[string]interface{}) (string, error) {
+// CreateUpbitJwtQuery jwt token 생성 (쿼리값 포함)
+func CreateUpbitJwtQuery(accessKey string, secretKey string, query map[string]interface{}) (string, error) {
 
 	q := url.Values{}
 
@@ -57,4 +60,46 @@ func GetJwtTokenWithQuery(accessKey string, secretKey string, query map[string]i
 		return "", nil
 	}
 	return tokenString, nil
+}
+
+// CreateJwt creates jwt token
+func CreateJwt(c echo.Context, data map[string]interface{}, expire time.Time, cookieName string) (string, error) {
+
+	token := jwt.New(jwt.SigningMethodHS256)
+	claims := token.Claims.(jwt.MapClaims)
+	for key, val := range data {
+		claims[key] = val
+	}
+	claims["exp"] = expire.Unix()
+
+	tokenString, err := token.SignedString([]byte(GetEnv("JWT_SECRET_KEY")))
+	if err != nil {
+		return "", err
+	}
+
+	if cookieName != "" {
+		cookie := new(http.Cookie)
+		cookie.Name = cookieName
+		cookie.Value = tokenString
+		cookie.Expires = expire
+		c.SetCookie(cookie)
+	}
+	return tokenString, nil
+}
+
+// GenerateJwt makes access token
+func GenerateJwt(c echo.Context, claims map[string]interface{}) (string, error) {
+	// access 토큰 생성: 유효기간 20분
+	accessToken, err := CreateJwt(
+		c,
+		claims,
+		time.Now().Add(time.Minute*20),
+		"access_token",
+	)
+
+	if err != nil {
+		return "", err
+	}
+
+	return accessToken, nil
 }

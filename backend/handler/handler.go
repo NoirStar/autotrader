@@ -9,6 +9,7 @@ import (
 	"github.com/noirstar/autotrader/api"
 	"github.com/noirstar/autotrader/db"
 	"github.com/noirstar/autotrader/model"
+	"github.com/noirstar/autotrader/utils"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -91,10 +92,24 @@ func PostLogin() echo.HandlerFunc {
 		}
 
 		user, err := db.LoginUser(params["id"], params["pw"])
+
 		if err != nil {
 			fmt.Println(err)
 			return c.String(http.StatusInternalServerError, "아이디 혹은 패스워드가 일치하지 않습니다")
 		}
+
+		// claim 생성
+		claims := map[string]interface{}{
+			"nickname": user.Nickname,
+		}
+
+		accessToken, err := utils.GenerateJwt(c, claims)
+		if err != nil {
+			fmt.Println(err)
+			return c.String(http.StatusInternalServerError, "JWT 토큰 발급에 실패하였습니다")
+		}
+		fmt.Println(user.Nickname, ":", accessToken)
+
 		return c.String(http.StatusOK, user.Nickname)
 	}
 }

@@ -15,14 +15,6 @@
       <router-link class="header-link mr-3" to="/login"> 로그인 </router-link>
       <router-link class="header-link" to="/signup">회원가입</router-link>
     </template>
-
-    <v-menu left bottom>
-      <template v-slot:activator="{ on, attrs }">
-        <v-btn icon v-bind="attrs" v-on="on">
-          <v-icon>mdi-dots-vertical</v-icon>
-        </v-btn>
-      </template>
-    </v-menu>
   </v-app-bar>
 </template>
 

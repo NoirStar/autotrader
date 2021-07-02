@@ -35,39 +35,37 @@
         <template v-if="item.changeRate >= 0">
           <template v-if="item.askBid == 'ASK'">
             <div class="price-up bold price-border-ask">
-              {{ convertPrice(item.price) }}
+              {{ item.price }}
             </div>
           </template>
           <template v-else>
             <div class="price-up bold price-border-bid">
-              {{ convertPrice(item.price) }}
+              {{ item.price }}
             </div>
           </template>
         </template>
         <template v-else>
-          <div class="price-down bold">{{ convertPrice(item.price) }}</div>
+          <div class="price-down bold">{{ item.price }}</div>
         </template>
       </template>
 
       <template v-slot:[`item.changeRate`]="{ item }">
         <template v-if="item.changeRate >= 0">
-          <div class="price-up">+{{ convertChangeRate(item.changeRate) }}%</div>
+          <div class="price-up">+{{ item.changeRate }}%</div>
         </template>
         <template v-else>
-          <div class="price-down">
-            -{{ convertChangeRate(item.changeRate) }}%
-          </div>
+          <div class="price-down">-{{ item.changeRate }}%</div>
         </template>
       </template>
 
       <template v-slot:[`item.highest52`]="{ item }">
-        {{ convertPrice(item.highest52) }}
+        {{ item.highest52 }}
       </template>
       <template v-slot:[`item.lowest52`]="{ item }">
-        {{ convertPrice(item.lowest52) }}
+        {{ item.lowest52 }}
       </template>
       <template v-slot:[`item.accTradePrice`]="{ item }">
-        {{ convertAccPrice(item.accTradePrice) }} 백만
+        {{ item.accTradePrice }} 백만
       </template>
     </v-data-table>
   </v-card>
@@ -122,15 +120,6 @@ export default {
         [],
       );
     },
-    convertPrice(price) {
-      return price.toLocaleString();
-    },
-    convertAccPrice(price) {
-      return Math.floor(price / 1000000).toLocaleString();
-    },
-    convertChangeRate(changeRate) {
-      return (changeRate * 100).toFixed(2);
-    },
   },
   computed: {},
   async created() {
@@ -144,13 +133,17 @@ export default {
           let result = JSON.parse(reader.result);
           this.coinInfo.forEach(e => {
             if (e.market === result.cd) {
-              this.$set(e, 'price', result.tp);
-              this.$set(e, 'changePrice', result.scp);
-              this.$set(e, 'changeRate', result.scr);
-              this.$set(e, 'accTradePrice', result.atp24h);
+              this.$set(e, 'price', result.tp.toLocaleString());
+              this.$set(e, 'changePrice', result.scp.toLocaleString());
+              this.$set(e, 'changeRate', (result.scr * 100).toFixed(2));
+              this.$set(
+                e,
+                'accTradePrice',
+                Math.floor(result.atp24h / 1000000).toLocaleString(),
+              );
               this.$set(e, 'askBid', result.ab);
-              this.$set(e, 'highest52', result.h52wp);
-              this.$set(e, 'lowest52', result.l52wp);
+              this.$set(e, 'highest52', result.h52wp.toLocaleString());
+              this.$set(e, 'lowest52', result.l52wp.toLocaleString());
             }
           });
         };
