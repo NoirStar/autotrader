@@ -1,6 +1,8 @@
 <template>
-  <v-main class="ma-6">
-    <CostTable></CostTable>
+  <v-main>
+    <v-container>
+      <CostTable></CostTable>
+    </v-container>
   </v-main>
 </template>
 

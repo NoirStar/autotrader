@@ -1,5 +1,5 @@
 <template>
-  <v-card>
+  <v-card class="mx-auto mt-16">
     <v-card-title>
       코인시세
       <v-spacer></v-spacer>

@@ -1,7 +1,9 @@
 <template>
-  <div>
-    <SignupForm></SignupForm>
-  </div>
+  <v-main>
+    <v-container>
+      <SignupForm></SignupForm>
+    </v-container>
+  </v-main>
 </template>
 
 <script>

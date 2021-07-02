@@ -1,6 +1,8 @@
 <template>
   <v-main>
-    <LoginForm></LoginForm>
+    <v-container>
+      <LoginForm></LoginForm>
+    </v-container>
   </v-main>
 </template>
 
