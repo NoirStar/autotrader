@@ -23,8 +23,9 @@ func New() *echo.Echo {
 	}))
 	e.Use(middleware.Recover())
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-		AllowOrigins: []string{"http://localhost:8080"},
-		AllowMethods: []string{http.MethodGet, http.MethodPost},
+		AllowCredentials: true,
+		AllowOrigins:     []string{"http://localhost:8080"},
+		AllowMethods:     []string{http.MethodGet, http.MethodPost},
 	}))
 
 	e.Static("/static", "public/views/index.html")
