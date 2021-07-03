@@ -3,18 +3,20 @@ import Vuex from 'vuex';
 import { loginUser } from '@/api/index';
 import { getCoinInfo } from '@/api/coin';
 import { connectWebSocket } from '@/api/websocket';
+import { getCookie, setCookie } from '@/cookies/index';
 
 Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
-    nickname: '',
+    nickname: getCookie('nickname') || '',
+    token: getCookie('access_token') || '',
     socketConn: null,
     coinInfo: [],
   },
   getters: {
     isLogin(state) {
-      return state.nickname !== '';
+      return state.token !== '';
     },
   },
   mutations: {
@@ -23,6 +25,12 @@ export default new Vuex.Store({
     },
     clearNickname(state) {
       state.nickname = '';
+    },
+    setToken(state, token) {
+      state.token = token;
+    },
+    clearToken(state) {
+      state.token = '';
     },
     setCoinInfo(state, data) {
       state.coinInfo = data.filter(e => {
@@ -39,7 +47,9 @@ export default new Vuex.Store({
   actions: {
     async LOGIN({ commit }, userData) {
       const { data } = await loginUser(userData);
+      commit('setToken', getCookie('access_token'));
       commit('setNickname', data);
+      setCookie('nickname', data);
       return data;
     },
     async COININFO({ commit }) {

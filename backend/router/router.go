@@ -8,6 +8,7 @@ import (
 	"github.com/labstack/gommon/log"
 	"github.com/noirstar/autotrader/db"
 	"github.com/noirstar/autotrader/handler"
+	"github.com/noirstar/autotrader/utils"
 )
 
 // New Initalize Webserver
@@ -35,10 +36,16 @@ func New() *echo.Echo {
 
 	// set routes
 	v1 := e.Group("/api/v1")
+	v1Auth := e.Group("/api/v1")
+
+	v1Auth.Use(middleware.JWTWithConfig(middleware.JWTConfig{
+		SigningKey: []byte(utils.GetEnv("JWT_SECRET_KEY")),
+		Claims:     &utils.JwtCustomClaims{},
+	}))
 
 	e.GET("/", handler.GetIndex())
-	v1.GET("/candles", handler.GetCandles())
-	v1.GET("/coins", handler.GetCoinInfo())
+	v1Auth.GET("/candles", handler.GetCandles())
+	v1Auth.GET("/coins", handler.GetCoinInfo())
 	v1.POST("/check", handler.PostCheck())
 	v1.POST("/signup", handler.PostRegisterUser())
 	v1.POST("/login", handler.PostLogin())

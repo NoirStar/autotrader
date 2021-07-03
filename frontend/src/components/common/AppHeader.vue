@@ -1,6 +1,6 @@
 <template>
   <v-app-bar color="grey darken-4" app clipped-left dense dark>
-    <router-link class="header-link" to="/">
+    <router-link class="header-link" :to="logoLink">
       <v-toolbar-title><b>T</b>ree Trader </v-toolbar-title>
     </router-link>
 
@@ -19,15 +19,23 @@
 </template>
 
 <script>
+import { removeCookie } from '@/cookies/index';
+
 export default {
   computed: {
     isLogin() {
       return this.$store.getters.isLogin;
     },
+    logoLink() {
+      return this.$store.getters.isLogin ? '/main' : '/login';
+    },
   },
   methods: {
     logoutUser() {
       this.$store.commit('clearNickname');
+      this.$store.commit('clearToken');
+      removeCookie('nickname');
+      removeCookie('access_token');
       this.$router.push('/login');
     },
   },

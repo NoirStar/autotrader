@@ -12,6 +12,12 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+// JwtCustomClaims jwt 커스텀 claims
+type JwtCustomClaims struct {
+	jwt.StandardClaims
+	Nickname string `json:"nickname"`
+}
+
 // CreateUpbitJwt jwt token 생성
 func CreateUpbitJwt(accessKey string, secretKey string) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
@@ -82,6 +88,7 @@ func CreateJwt(c echo.Context, data map[string]interface{}, expire time.Time, co
 		cookie.Name = cookieName
 		cookie.Value = tokenString
 		cookie.Expires = expire
+		cookie.Path = "/"
 		c.SetCookie(cookie)
 	}
 	return tokenString, nil

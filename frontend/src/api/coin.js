@@ -1,11 +1,20 @@
 import axios from 'axios';
+import { setInterceptors } from './common/interceptors';
 
-const commonInst = axios.create({
-  baseURL: process.env.VUE_APP_API_URL,
-});
+// 엑시오스 초기화 함수
+function createInstance() {
+  const instance = axios.create({
+    baseURL: process.env.VUE_APP_API_URL,
+  });
 
+  return setInterceptors(instance);
+}
+
+const instance = createInstance();
+
+// 코인 리스트정보 API
 function getCoinInfo() {
-  return commonInst.get('coins');
+  return instance.get('coins');
 }
 
 export { getCoinInfo };
