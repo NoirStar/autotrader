@@ -54,7 +54,7 @@
           <div class="price-up">+{{ item.changeRate }}%</div>
         </template>
         <template v-else>
-          <div class="price-down">-{{ item.changeRate }}%</div>
+          <div class="price-down">{{ item.changeRate }}%</div>
         </template>
       </template>
 
@@ -131,6 +131,7 @@ export default {
         let reader = new FileReader();
         reader.onload = () => {
           let result = JSON.parse(reader.result);
+
           this.coinInfo.forEach(e => {
             if (e.market === result.cd) {
               this.$set(e, 'price', result.tp.toLocaleString());

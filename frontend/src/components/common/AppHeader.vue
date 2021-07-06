@@ -1,7 +1,7 @@
 <template>
-  <v-app-bar color="grey darken-4" app clipped-left dense dark>
+  <v-app-bar color="blue darken-4" app clipped-left dense dark>
     <router-link class="header-link" :to="logoLink">
-      <v-toolbar-title><b>T</b>ree Trader </v-toolbar-title>
+      <v-toolbar-title><b>T</b>ree <b>T</b>rader </v-toolbar-title>
     </router-link>
 
     <v-spacer></v-spacer>
@@ -45,7 +45,7 @@ export default {
 <style scoped>
 .header-link {
   text-decoration: none;
-  color: #b2c0cc;
+  color: #cad0d6;
   font-weight: 500;
   transition-delay: initial;
   transition-duration: 0.08s;

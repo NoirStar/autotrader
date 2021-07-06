@@ -60,3 +60,6 @@ cd ../backend
 go run main.go
 ```
 
+## Part of WebPage
+
+![1](https://user-images.githubusercontent.com/44075494/124548553-dbc4b980-de68-11eb-83b0-25e8a69c0e48.png)

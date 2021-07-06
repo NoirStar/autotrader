@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/noirstar/autotrader/api"
 	"github.com/noirstar/autotrader/router"
 )
 
@@ -23,6 +24,7 @@ func main() {
 	// // for idx, candle := range series.Candles {
 	// // 	fmt.Println(idx, candle.ClosePrice)
 	// // }
+	go api.InitWSSClient()
 
 	debug := true
 
