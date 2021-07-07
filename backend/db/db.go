@@ -16,8 +16,9 @@ import (
 )
 
 var (
-	errCreateUser error = errors.New("DB Error : CreateUser")
-	errLoginUser  error = errors.New("DB Error : LoginUser")
+	errCreateUser     error = errors.New("DB Error : CreateUser")
+	errLoginUser      error = errors.New("DB Error : LoginUser")
+	errFindMarketData error = errors.New("DB Error : FindMarketData")
 )
 
 // New makes new connection with mongodb
@@ -49,7 +50,7 @@ func CreateUser(user *model.User) error {
 	if err != nil {
 		return err
 	}
-	collection := client.Database("autotrader").Collection("users")
+	collection := client.Database("common").Collection("user")
 
 	defer client.Disconnect(ctx)
 	defer cancel()
@@ -84,7 +85,7 @@ func LoginUser(id, pw string) (*model.User, error) {
 	if err != nil {
 		return nil, err
 	}
-	collection := client.Database("autotrader").Collection("users")
+	collection := client.Database("common").Collection("user")
 	var result *model.User
 
 	defer client.Disconnect(ctx)
@@ -114,7 +115,7 @@ func CheckDuplicate(params map[string]string) (bool, error) {
 	defer client.Disconnect(ctx)
 	defer cancel()
 
-	collection := client.Database("autotrader").Collection("users")
+	collection := client.Database("common").Collection("user")
 
 	for key, val := range params {
 		filter := bson.M{key: val}
@@ -128,4 +129,69 @@ func CheckDuplicate(params map[string]string) (bool, error) {
 		}
 	}
 	return false, nil
+}
+
+// FindMarketData 디비 데이터 aggregate
+func FindMarketData(minute time.Duration) ([]bson.M, error) {
+	time := (time.Now().Add(-minute)).Unix()
+	client, ctx, cancel, err := New()
+	if err != nil {
+		return nil, err
+	}
+
+	defer client.Disconnect(ctx)
+	defer cancel()
+
+	collection := client.Database("coin").Collection("trade")
+
+	// matchAsk := bson.D{{"$match", bson.D{{"ask_bid", "ASK"}}}}
+	// matchBid := bson.D{{"$match", bson.D{{"ask_bid", "Bid"}}}}
+	// matchTime := bson.D{{"$match", bson.D{{"$gte", bson.D{{"trade_timestamp", time}}}}}}
+
+	a := bson.D{{"$match", bson.D{{
+		"$and", bson.A{
+			bson.D{{"ask_bid", "ASK"}},
+			bson.D{{"trade_timestamp", bson.D{{"$gte", time}}}},
+		},
+	}}}}
+
+	groupAsk := bson.D{{
+		"$group", bson.D{
+			{"_id", "$code"},
+			{"ask_count", bson.D{{"$sum", "$trade_volume"}}},
+			{"ask_total", bson.D{{"$sum", bson.D{{"$multiply", bson.A{"$trade_volume", "$trade_price"}}}}}},
+		},
+	}}
+	groupBid := bson.D{{
+		"$group", bson.D{
+			{"_id", "$code"},
+			{"bid_count", bson.D{{"$sum", "$trade_volume"}}},
+			{"bid_total", bson.D{{"$sum", bson.D{{"$multiply", bson.A{"$trade_volume", "$trade_price"}}}}}},
+		},
+	}}
+
+	askCursor, err := collection.Aggregate(ctx, mongo.Pipeline{a, groupAsk})
+	if err != nil {
+		return nil, err
+	}
+	bidCursor, err := collection.Aggregate(ctx, mongo.Pipeline{a, groupBid})
+	if err != nil {
+		return nil, err
+	}
+	var askData []bson.M
+	var bidData []bson.M
+	var market map[string]model.Market
+
+	if err = askCursor.All(ctx, &askData); err != nil {
+		return nil, errFindMarketData
+	}
+	if err = bidCursor.All(ctx, &bidData); err != nil {
+		return nil, errFindMarketData
+	}
+
+	for _, val := range askData {
+		market[val["_id"]].AskCount = val["ask_count"]
+	}
+
+	return nil, nil
 }

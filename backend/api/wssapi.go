@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/gorilla/websocket"
 	"github.com/noirstar/autotrader/db"
@@ -48,31 +49,46 @@ func InitWSSClient() {
 	a := model.NewReqForInfoWSS("trade", codes, true)
 	cSendingMsg <- a.ReqForInfoJSON()
 
-	// db 처리
-
-	var datas []model.ResTradeWSS
+	// db 처리 10마다 한번씩 저장
+	datas := make([]model.ResTradeWSS, 0)
+	ticker := time.NewTicker(time.Second * 10)
 
 	for {
-		data := model.ResTradeWSS{}
-		err = json.Unmarshal(<-cIncomingMsg, &data)
-		utils.CheckErr(err)
-		datas = append(datas, data)
-		if len(datas) == 1000 {
-			saveCoinData(datas)
+		select {
+		case msg := <-cIncomingMsg:
+			data := model.ResTradeWSS{}
+			err = json.Unmarshal(msg, &data)
+			utils.CheckErr(err)
+			datas = append(datas, data)
+		case <-ticker.C:
+			fmt.Println("save data length :", len(datas))
+			err = saveCoinData(datas)
+			utils.CheckErr(err)
+			datas = make([]model.ResTradeWSS, 0)
 		}
 	}
 }
 
-func saveCoinData(datas []interface{}) {
+func saveCoinData(datas []model.ResTradeWSS) error {
+
+	insertableList := make([]interface{}, len(datas))
+	for idx, val := range datas {
+		insertableList[idx] = val
+	}
 
 	client, ctx, cancel, err := db.New()
-	utils.CheckErr(err)
-	collection := client.Database("autotrader").Collection("coins")
+	if err != nil {
+		return err
+	}
+	collection := client.Database("coin").Collection("trade")
 
 	defer client.Disconnect(ctx)
 	defer cancel()
-	_, err = collection.InsertMany(ctx, datas)
-	utils.CheckErr(err)
+	_, err = collection.InsertMany(ctx, insertableList)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func readWSMessage(ws *websocket.Conn, cIncomingMsg chan<- []byte) error {

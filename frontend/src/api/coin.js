@@ -17,4 +17,9 @@ function getCoinInfo() {
   return instance.get('coins');
 }
 
-export { getCoinInfo };
+// 코인 마켓리스트정보 API
+function getMarketInfo() {
+  return instance.get('market');
+}
+
+export { getCoinInfo, getMarketInfo };

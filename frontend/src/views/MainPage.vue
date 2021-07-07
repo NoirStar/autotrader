@@ -1,6 +1,7 @@
 <template>
   <v-main>
     <v-container>
+      <MarketTable></MarketTable>
       <CostTable></CostTable>
     </v-container>
   </v-main>
@@ -8,8 +9,9 @@
 
 <script>
 import CostTable from '@/components/CostTable.vue';
+import MarketTable from '@/components/MarketTable.vue';
 export default {
-  components: { CostTable },
+  components: { CostTable, MarketTable },
 };
 </script>
 

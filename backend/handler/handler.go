@@ -39,6 +39,17 @@ func GetCoinInfo() echo.HandlerFunc {
 	}
 }
 
+// GetMarketInfo Return Market aggregate info
+func GetMarketInfo() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		data, err := db.FindMarketData(1)
+		if err != nil {
+			fmt.Println(err)
+		}
+		return c.JSON(http.StatusOK, data)
+	}
+}
+
 // PostRegisterUser 회원가입 핸들러
 func PostRegisterUser() echo.HandlerFunc {
 	return func(c echo.Context) error {
