@@ -41,20 +41,20 @@ type ResTickerWSS struct {
 
 // ResTradeWSS 체결 응답 데이터 포멧
 type ResTradeWSS struct {
-	Type             string  `json:"type"`               // 타입 : trade
-	Code             string  `json:"code"`               // 마켓코드
-	TradePrice       float64 `json:"trade_price"`        // 체결 가격
-	TradeVolume      float64 `json:"trade_volume"`       // 체결량
-	AskBid           string  `json:"ask_bid"`            // 매수/매도 구분 ASK : 매도 BID : 매수
-	PrevClosingPrice float64 `json:"prev_closing_price"` // 전일 종가
-	Change           string  `json:"change"`             // 전일 대비 RISE :  상승 EVEN : 보합 FALL : 하락
-	ChangePrice      float64 `json:"change_price"`       // 부호 없는 전일 대비 값
-	TradeDate        string  `json:"trade_date"`         // 체결 일자(UTC 기준)
-	TradeTime        string  `json:"trade_time"`         // 체결 시각(UTC 기준)
-	TradeTimestamp   int     `json:"trade_timestamp"`    // 체결 타임스탬프 (millisecond)
-	Timestamp        int     `json:"timestamp"`          // 타임스탬프 (millisecond)
-	SequentialID     int     `json:"sequential_id"`      // 체결 번호 (Unique)  - 체결의 유일성 판단을 위한 근거로 쓰일 수 있습니다. 하지만 체결의 순서를 보장하지는 못합니다.
-	StreamType       string  `json:"stream_type"`        // 스트림 타입  SNAPSHOT : 스냅샷 REALTIME : 실시간
+	Type             string  `json:"type" bson:"type"`                             // 타입 : trade
+	Code             string  ` json:"code" bson:"code"`                            // 마켓코드
+	TradePrice       float64 `json:"trade_price" bson:"trade_price"`               // 체결 가격
+	TradeVolume      float64 `json:"trade_volume" bson:"trade_volume"`             // 체결량
+	AskBid           string  `json:"ask_bid" bson:"ask_bid"`                       // 매수/매도 구분 ASK : 매도 BID : 매수
+	PrevClosingPrice float64 `json:"prev_closing_price" bson:"prev_closing_price"` // 전일 종가
+	Change           string  `json:"change" bson:"change"`                         // 전일 대비 RISE :  상승 EVEN : 보합 FALL : 하락
+	ChangePrice      float64 `json:"change_price" bson:"change_price"`             // 부호 없는 전일 대비 값
+	TradeDate        string  `json:"trade_date" bson:"trade_date"`                 // 체결 일자(UTC 기준)
+	TradeTime        string  `json:"trade_time" bson:"trade_time"`                 // 체결 시각(UTC 기준)
+	TradeTimestamp   int     `json:"trade_timestamp" bson:"trade_timestamp"`       // 체결 타임스탬프 (millisecond)
+	Timestamp        int     `json:"timestamp" bson:"timestamp"`                   // 타임스탬프 (millisecond)
+	SequentialID     int     `json:"sequential_id" bson:"sequential_id"`           // 체결 번호 (Unique)  - 체결의 유일성 판단을 위한 근거로 쓰일 수 있습니다. 하지만 체결의 순서를 보장하지는 못합니다.
+	StreamType       string  `json:"stream_type" bson:"stream_type"`               // 스트림 타입  SNAPSHOT : 스냅샷 REALTIME : 실시간
 }
 
 // ResOrderWSS 체결 응답 데이터 포멧

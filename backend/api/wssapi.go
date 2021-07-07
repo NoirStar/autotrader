@@ -50,26 +50,29 @@ func InitWSSClient() {
 
 	// db 처리
 
-	for msg := range cIncomingMsg {
-		cMongo := make(chan []byte)
+	var datas []model.ResTradeWSS
 
-		go func() {
-			defer close(cMongo)
-			coinData := <-cMongo
-			client, ctx, cancel, err := db.New()
-			utils.CheckErr(err)
-			collection := client.Database("autotrader").Collection("coins")
-
-			defer client.Disconnect(ctx)
-			defer cancel()
-			data := model.Coin{}
-			err = json.Unmarshal(coinData, &data)
-			utils.CheckErr(err)
-			_, err = collection.InsertOne(ctx, data)
-			utils.CheckErr(err)
-		}()
-
+	for {
+		data := model.ResTradeWSS{}
+		err = json.Unmarshal(<-cIncomingMsg, &data)
+		utils.CheckErr(err)
+		datas = append(datas, data)
+		if len(datas) == 1000 {
+			saveCoinData(datas)
+		}
 	}
+}
+
+func saveCoinData(datas []interface{}) {
+
+	client, ctx, cancel, err := db.New()
+	utils.CheckErr(err)
+	collection := client.Database("autotrader").Collection("coins")
+
+	defer client.Disconnect(ctx)
+	defer cancel()
+	_, err = collection.InsertMany(ctx, datas)
+	utils.CheckErr(err)
 }
 
 func readWSMessage(ws *websocket.Conn, cIncomingMsg chan<- []byte) error {
