@@ -25,6 +25,11 @@ const router = new VueRouter({
       meta: { auth: true },
     },
     {
+      path: '/market',
+      component: () => import('@/views/MarketPage.vue'),
+      meta: { auth: true },
+    },
+    {
       path: '*',
       component: () => import('@/views/NotFoundPage.vue'),
     },

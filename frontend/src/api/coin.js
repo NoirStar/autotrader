@@ -18,8 +18,8 @@ function getCoinInfo() {
 }
 
 // 코인 마켓리스트정보 API
-function getMarketInfo() {
-  return instance.get('market');
+function getMarketInfo(minute) {
+  return instance.post('market', minute);
 }
 
 export { getCoinInfo, getMarketInfo };

@@ -123,37 +123,41 @@ export default {
   },
   computed: {},
   async created() {
-    await this.$store.dispatch('COININFO');
-    this.coinInfo = this.$store.state.coinInfo;
-    const conn = await this.$store.dispatch('CONNECTION');
-    conn.onmessage = ({ data }) => {
-      if (data instanceof Blob) {
-        let reader = new FileReader();
-        reader.onload = () => {
-          let result = JSON.parse(reader.result);
+    try {
+      await this.$store.dispatch('COININFO');
+      this.coinInfo = this.$store.state.coinInfo;
+      const conn = await this.$store.dispatch('CONNECTION');
+      conn.onmessage = ({ data }) => {
+        if (data instanceof Blob) {
+          let reader = new FileReader();
+          reader.onload = () => {
+            let result = JSON.parse(reader.result);
 
-          this.coinInfo.forEach(e => {
-            if (e.market === result.cd) {
-              this.$set(e, 'price', result.tp.toLocaleString());
-              this.$set(e, 'changePrice', result.scp.toLocaleString());
-              this.$set(e, 'changeRate', (result.scr * 100).toFixed(2));
-              this.$set(
-                e,
-                'accTradePrice',
-                Math.floor(result.atp24h / 1000000).toLocaleString(),
-              );
-              this.$set(e, 'askBid', result.ab);
-              this.$set(e, 'highest52', result.h52wp.toLocaleString());
-              this.$set(e, 'lowest52', result.l52wp.toLocaleString());
-            }
-          });
-        };
-        reader.readAsText(data);
-      }
-    };
-    conn.send(
-      `[{"ticket":"tree"},{"type":"ticker","codes":[${this.makeCodes()}]},{"format":"SIMPLE"}]`,
-    );
+            this.coinInfo.forEach(e => {
+              if (e.market === result.cd) {
+                this.$set(e, 'price', result.tp.toLocaleString());
+                this.$set(e, 'changePrice', result.scp.toLocaleString());
+                this.$set(e, 'changeRate', (result.scr * 100).toFixed(2));
+                this.$set(
+                  e,
+                  'accTradePrice',
+                  Math.floor(result.atp24h / 1000000).toLocaleString(),
+                );
+                this.$set(e, 'askBid', result.ab);
+                this.$set(e, 'highest52', result.h52wp.toLocaleString());
+                this.$set(e, 'lowest52', result.l52wp.toLocaleString());
+              }
+            });
+          };
+          reader.readAsText(data);
+        }
+      };
+      conn.send(
+        `[{"ticket":"tree"},{"type":"ticker","codes":[${this.makeCodes()}]},{"format":"SIMPLE"}]`,
+      );
+    } catch (error) {
+      console.log(error.response.data);
+    }
   },
 };
 </script>
