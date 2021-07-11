@@ -27,6 +27,18 @@
           <small> {{ item.code }}</small>
         </div>
       </template>
+      <template v-slot:[`item.AskTotal`]="{ item }">
+        {{ item.AskTotal.toLocaleString() }}
+      </template>
+      <template v-slot:[`item.BidTotal`]="{ item }">
+        {{ item.BidTotal.toLocaleString() }}
+      </template>
+      <template v-slot:[`item.AskCount`]="{ item }">
+        {{ item.AskCount.toLocaleString() }}
+      </template>
+      <template v-slot:[`item.BidCount`]="{ item }">
+        {{ item.BidCount.toLocaleString() }}
+      </template>
       <template v-slot:[`item.change`]="{ item }">
         <template v-if="item.change > 0">
           <div class="price-up">▲ {{ item.change }}</div>
@@ -122,9 +134,7 @@ export default {
               value['codeName'] = e.korean_name;
             }
           });
-          value['AskCount'] = value['AskCount'].toFixed(2);
           value['AskTotal'] = parseInt(value['AskTotal']);
-          value['BidCount'] = value['BidCount'].toFixed(2);
           value['BidTotal'] = parseInt(value['BidTotal']);
           this.marketData.push(value);
         }

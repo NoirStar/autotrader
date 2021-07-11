@@ -35,17 +35,17 @@
         <template v-if="item.changeRate >= 0">
           <template v-if="item.askBid == 'ASK'">
             <div class="price-up bold price-border-ask">
-              {{ item.price }}
+              {{ item.price.toLocaleString() }}
             </div>
           </template>
           <template v-else>
             <div class="price-up bold price-border-bid">
-              {{ item.price }}
+              {{ item.price.toLocaleString() }}
             </div>
           </template>
         </template>
         <template v-else>
-          <div class="price-down bold">{{ item.price }}</div>
+          <div class="price-down bold">{{ item.price.toLocaleString() }}</div>
         </template>
       </template>
 
@@ -59,13 +59,13 @@
       </template>
 
       <template v-slot:[`item.highest52`]="{ item }">
-        {{ item.highest52 }}
+        {{ item.highest52.toLocaleString() }}
       </template>
       <template v-slot:[`item.lowest52`]="{ item }">
-        {{ item.lowest52 }}
+        {{ item.lowest52.toLocaleString() }}
       </template>
       <template v-slot:[`item.accTradePrice`]="{ item }">
-        {{ item.accTradePrice }} 백만
+        {{ Math.floor(item.accTradePrice / 1000000).toLocaleString() }} 백만
       </template>
     </v-data-table>
   </v-card>
@@ -135,17 +135,13 @@ export default {
 
             this.coinInfo.forEach(e => {
               if (e.market === result.cd) {
-                this.$set(e, 'price', result.tp.toLocaleString());
-                this.$set(e, 'changePrice', result.scp.toLocaleString());
+                this.$set(e, 'price', result.tp);
+                this.$set(e, 'changePrice', result.scp);
                 this.$set(e, 'changeRate', (result.scr * 100).toFixed(2));
-                this.$set(
-                  e,
-                  'accTradePrice',
-                  Math.floor(result.atp24h / 1000000).toLocaleString(),
-                );
+                this.$set(e, 'accTradePrice', result.atp24h);
                 this.$set(e, 'askBid', result.ab);
-                this.$set(e, 'highest52', result.h52wp.toLocaleString());
-                this.$set(e, 'lowest52', result.l52wp.toLocaleString());
+                this.$set(e, 'highest52', result.h52wp);
+                this.$set(e, 'lowest52', result.l52wp);
               }
             });
           };
