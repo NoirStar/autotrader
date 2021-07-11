@@ -132,7 +132,7 @@ func CheckDuplicate(params map[string]string) (bool, error) {
 }
 
 // FindMarketData 디비 데이터 aggregate
-func FindMarketData(minute time.Duration) ([]bson.M, error) {
+func FindMarketData(minute time.Duration) (*model.Market, error) {
 	time := (time.Now().Add(-minute)).Unix()
 	client, ctx, cancel, err := New()
 	if err != nil {
@@ -144,13 +144,15 @@ func FindMarketData(minute time.Duration) ([]bson.M, error) {
 
 	collection := client.Database("coin").Collection("trade")
 
-	// matchAsk := bson.D{{"$match", bson.D{{"ask_bid", "ASK"}}}}
-	// matchBid := bson.D{{"$match", bson.D{{"ask_bid", "Bid"}}}}
-	// matchTime := bson.D{{"$match", bson.D{{"$gte", bson.D{{"trade_timestamp", time}}}}}}
-
-	a := bson.D{{"$match", bson.D{{
+	matchAsk := bson.D{{"$match", bson.D{{
 		"$and", bson.A{
 			bson.D{{"ask_bid", "ASK"}},
+			bson.D{{"trade_timestamp", bson.D{{"$gte", time}}}},
+		},
+	}}}}
+	matchBid := bson.D{{"$match", bson.D{{
+		"$and", bson.A{
+			bson.D{{"ask_bid", "BID"}},
 			bson.D{{"trade_timestamp", bson.D{{"$gte", time}}}},
 		},
 	}}}}
@@ -170,17 +172,19 @@ func FindMarketData(minute time.Duration) ([]bson.M, error) {
 		},
 	}}
 
-	askCursor, err := collection.Aggregate(ctx, mongo.Pipeline{a, groupAsk})
+	askCursor, err := collection.Aggregate(ctx, mongo.Pipeline{matchAsk, groupAsk})
 	if err != nil {
 		return nil, err
 	}
-	bidCursor, err := collection.Aggregate(ctx, mongo.Pipeline{a, groupBid})
+	bidCursor, err := collection.Aggregate(ctx, mongo.Pipeline{matchBid, groupBid})
 	if err != nil {
 		return nil, err
 	}
 	var askData []bson.M
 	var bidData []bson.M
-	var market map[string]model.Market
+	cAsk := make(chan bool)
+	cBid := make(chan bool)
+	market := make(model.Market)
 
 	if err = askCursor.All(ctx, &askData); err != nil {
 		return nil, errFindMarketData
@@ -190,8 +194,54 @@ func FindMarketData(minute time.Duration) ([]bson.M, error) {
 	}
 
 	for _, val := range askData {
-		market[val["_id"]].AskCount = val["ask_count"]
+		code := fmt.Sprint(val["_id"])
+		marketData := &model.MarketData{}
+		market[code] = marketData
+	}
+	for _, val := range bidData {
+		code := fmt.Sprint(val["_id"])
+		marketData := &model.MarketData{}
+		market[code] = marketData
 	}
 
-	return nil, nil
+	go func() {
+		for _, val := range askData {
+			code := fmt.Sprint(val["_id"])
+			marketData := &model.MarketData{}
+			bsonData, err := bson.Marshal(val)
+			if err != nil {
+				cAsk <- false
+				return
+			}
+			err = bson.Unmarshal(bsonData, &marketData)
+			if err != nil {
+				cAsk <- false
+				return
+			}
+			market[code].AskCount = marketData.AskCount
+			market[code].AskTotal = marketData.AskTotal
+		}
+		cAsk <- true
+	}()
+	go func() {
+		for _, val := range bidData {
+			code := fmt.Sprint(val["_id"])
+			marketData := &model.MarketData{}
+			bsonData, err := bson.Marshal(val)
+			if err != nil {
+				cBid <- false
+				return
+			}
+			err = bson.Unmarshal(bsonData, &marketData)
+			if err != nil {
+				cBid <- false
+				return
+			}
+			market[code].BidCount = marketData.BidCount
+			market[code].BidTotal = marketData.BidTotal
+		}
+		cBid <- true
+	}()
+
+	return &market, nil
 }

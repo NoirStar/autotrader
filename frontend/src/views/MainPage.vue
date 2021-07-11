@@ -1,15 +1,15 @@
 <template>
   <v-main>
     <v-container>
-      <MarketTable></MarketTable>
+      <CostTable></CostTable>
     </v-container>
   </v-main>
 </template>
 
 <script>
-import MarketTable from '@/components/MarketTable.vue';
+import CostTable from '../components/CostTable.vue';
 export default {
-  components: { MarketTable },
+  components: { CostTable },
 };
 </script>
 

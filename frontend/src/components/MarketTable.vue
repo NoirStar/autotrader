@@ -45,6 +45,7 @@ export default {
     return {
       conn: null,
       search: '',
+      prevMarketData: [],
       marketData: [],
       coinInfo: [],
       headers: [

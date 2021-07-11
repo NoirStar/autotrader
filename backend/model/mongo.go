@@ -12,9 +12,12 @@ type User struct {
 }
 
 // Market model
-type Market struct {
-	AskCount float64 `json:"ask_count"`
-	AskTotal float64 `json:"ask_total"`
-	BidCount float64 `json:"bid_count"`
-	BidTotal float64 `json:"bid_total"`
+type Market map[string]*MarketData
+
+// MarketData model
+type MarketData struct {
+	AskCount float64 `bson:"ask_count,omitempty"`
+	AskTotal float64 `bson:"ask_total,omitempty"`
+	BidCount float64 `bson:"bid_count,omitempty"`
+	BidTotal float64 `bson:"bid_total,omitempty"`
 }

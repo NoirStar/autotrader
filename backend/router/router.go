@@ -46,7 +46,7 @@ func New() *echo.Echo {
 	e.GET("/", handler.GetIndex())
 	v1Auth.GET("/candles", handler.GetCandles())
 	v1Auth.GET("/coins", handler.GetCoinInfo())
-	v1Auth.GET("/market", handler.GetMarketInfo())
+	v1Auth.POST("/market", handler.GetMarketInfo())
 	v1.POST("/check", handler.PostCheck())
 	v1.POST("/signup", handler.PostRegisterUser())
 	v1.POST("/login", handler.PostLogin())

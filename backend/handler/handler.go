@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/labstack/echo/v4"
 	"github.com/noirstar/autotrader/api"
@@ -42,10 +43,25 @@ func GetCoinInfo() echo.HandlerFunc {
 // GetMarketInfo Return Market aggregate info
 func GetMarketInfo() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		data, err := db.FindMarketData(1)
+		params := make(map[string]int)
+		err := c.Bind(&params)
 		if err != nil {
 			fmt.Println(err)
+			return c.String(http.StatusInternalServerError, "파라미터 바인딩에 실패했습니다")
 		}
+
+		if len(params) != 1 {
+			return c.String(http.StatusBadRequest, "잘못된 요청입니다")
+		}
+
+		market, err := db.FindMarketData(time.Duration(params["min"]))
+		if err != nil {
+			fmt.Println(err)
+			return c.String(http.StatusInternalServerError, "마켓데이터 요청에 실패했습니다")
+		}
+
+		data, err := json.Marshal(market)
+
 		return c.JSON(http.StatusOK, data)
 	}
 }

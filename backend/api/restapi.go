@@ -146,7 +146,7 @@ func RequestToServer(reqURL string, method string, tokenString string, query map
 	}
 	req.URL.RawQuery = q.Encode()
 
-	fmt.Println(q.Encode())
+	//fmt.Println(q.Encode())
 
 	req.Header.Add("Authorization", "Bearer "+tokenString)
 	res, err := client.Do(req)
@@ -185,7 +185,7 @@ func RequestToServerSimple(reqURL string, method string, query map[string]interf
 	}
 	req.URL.RawQuery = q.Encode()
 
-	fmt.Println(q.Encode())
+	//fmt.Println(q.Encode())
 
 	res, err := client.Do(req)
 	utils.CheckErr(err)
