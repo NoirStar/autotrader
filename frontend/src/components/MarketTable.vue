@@ -11,14 +11,8 @@
         hide-details
       ></v-text-field>
     </v-card-title>
-    <v-data-table
-      :headers="headers"
-      :items="marketData"
-      :search="search"
-      :disable-pagination="true"
-      :hide-default-footer="true"
-      item-key="code"
-    >
+
+    <v-data-table :headers="headers" :items="marketData" :search="search">
       <template class="d-flex flex-row" v-slot:[`item.codeName`]="{ item }">
         <div>
           <img
@@ -33,6 +27,15 @@
           <small> {{ item.code }}</small>
         </div>
       </template>
+      <template v-slot:[`item.change`]="{ item }">
+        <template v-if="item.change > 0">
+          <div class="price-up">▲ {{ item.change }}</div>
+        </template>
+        <template v-else-if="item.change < 0">
+          <div class="price-down">▼ {{ Math.abs(item.change) }}</div>
+        </template>
+        <template v-else> - </template>
+      </template>
     </v-data-table>
   </v-card>
 </template>
@@ -45,9 +48,12 @@ export default {
     return {
       conn: null,
       search: '',
-      prevMarketData: [],
+      interval: undefined,
+      prevMarketRank: {},
       marketData: [],
       coinInfo: [],
+      minute: 5,
+      minutes: [1, 3, 5, 15, 30, 60],
       headers: [
         {
           text: '코인',
@@ -70,39 +76,82 @@ export default {
           text: '매도량',
           value: 'BidTotal',
         },
+        {
+          text: '매수순위',
+          value: 'rank',
+        },
+        {
+          text: '매수순위변동',
+          value: 'change',
+        },
       ],
     };
   },
   async created() {
-    try {
-      const minute = {
-        min: 1,
-      };
-      const resCoin = await getCoinInfo();
-      this.coinInfo = resCoin.data;
-      const { data } = await getMarketInfo(minute);
-
-      let temp = JSON.parse(atob(data));
-
-      for (const key of Object.keys(temp)) {
-        temp[key]['code'] = key;
-      }
-
-      for (const value of Object.values(temp)) {
-        this.coinInfo.forEach(e => {
-          if (e.market == value['code']) {
-            value['codeName'] = e.korean_name;
-          }
-        });
-        value['AskCount'] = value['AskCount'].toFixed(2);
-        value['AskTotal'] = parseInt(value['AskTotal']);
-        value['BidCount'] = value['BidCount'].toFixed(2);
-        value['BidTotal'] = parseInt(value['BidTotal']);
-        this.marketData.push(value);
-      }
-    } catch (error) {
-      console.log(error.response.data);
+    const { data } = await getCoinInfo();
+    this.coinInfo = data;
+    this.getMarketData(this.minute);
+    this.interval = setInterval(() => {
+      this.getMarketData(this.minute);
+    }, this.minute * 60000);
+  },
+  beforeDestroy() {
+    if (this.interval) {
+      clearInterval(this.interval);
+      this.interval = undefined;
     }
+  },
+  methods: {
+    async getMarketData(min) {
+      try {
+        const minute = {
+          min: min,
+        };
+        console.log('get marketdata');
+        const { data } = await getMarketInfo(minute);
+
+        let temp = JSON.parse(atob(data));
+
+        for (const key of Object.keys(temp)) {
+          temp[key]['code'] = key;
+        }
+        this.marketData = [];
+        for (const value of Object.values(temp)) {
+          this.coinInfo.forEach(e => {
+            if (e.market == value['code']) {
+              value['codeName'] = e.korean_name;
+            }
+          });
+          value['AskCount'] = value['AskCount'].toFixed(2);
+          value['AskTotal'] = parseInt(value['AskTotal']);
+          value['BidCount'] = value['BidCount'].toFixed(2);
+          value['BidTotal'] = parseInt(value['BidTotal']);
+          this.marketData.push(value);
+        }
+        this.marketData.sort((a, b) => {
+          return b.AskTotal - a.AskTotal;
+        });
+
+        if (Object.keys(this.prevMarketRank).length === 0) {
+          this.marketData.forEach((e, idx) => {
+            e['rank'] = idx + 1;
+            this.prevMarketRank[e.code] = idx + 1;
+          });
+        } else {
+          this.marketData.forEach((e, idx) => {
+            e['rank'] = idx + 1;
+            if (Object.keys(this.prevMarketRank).includes(e['code'])) {
+              e['change'] = this.prevMarketRank[e.code] - (idx + 1);
+            } else {
+              e['change'] = '-';
+            }
+            this.prevMarketRank[e.code] = idx + 1;
+          });
+        }
+      } catch (error) {
+        console.log(error.response.data);
+      }
+    },
   },
 };
 </script>
@@ -110,5 +159,13 @@ export default {
 <style scoped>
 .coin-logo {
   width: 0.775rem;
+}
+
+.price-up {
+  color: #f06d6f;
+}
+
+.price-down {
+  color: #4480da;
 }
 </style>

@@ -96,11 +96,11 @@ func CreateJwt(c echo.Context, data map[string]interface{}, expire time.Time, co
 
 // GenerateJwt makes access token
 func GenerateJwt(c echo.Context, claims map[string]interface{}) (string, error) {
-	// access 토큰 생성: 유효기간 20분
+	// access 토큰 생성: 유효기간 2시간
 	accessToken, err := CreateJwt(
 		c,
 		claims,
-		time.Now().Add(time.Minute*20),
+		time.Now().Add(time.Hour*2),
 		"access_token",
 	)
 
