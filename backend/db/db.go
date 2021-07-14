@@ -133,7 +133,7 @@ func CheckDuplicate(params map[string]string) (bool, error) {
 
 // FindMarketData 디비 데이터 aggregate
 func FindMarketData(minute time.Duration) (*model.Market, error) {
-	time := (time.Now().Add(-minute)).Unix()
+	nowTime := (time.Now().Add(-minute)).Unix()
 	client, ctx, cancel, err := New()
 	if err != nil {
 		return nil, err
@@ -147,13 +147,13 @@ func FindMarketData(minute time.Duration) (*model.Market, error) {
 	matchAsk := bson.D{{"$match", bson.D{{
 		"$and", bson.A{
 			bson.D{{"ask_bid", "ASK"}},
-			bson.D{{"trade_timestamp", bson.D{{"$gte", time}}}},
+			bson.D{{"trade_timestamp", bson.D{{"$gte", nowTime}}}},
 		},
 	}}}}
 	matchBid := bson.D{{"$match", bson.D{{
 		"$and", bson.A{
 			bson.D{{"ask_bid", "BID"}},
-			bson.D{{"trade_timestamp", bson.D{{"$gte", time}}}},
+			bson.D{{"trade_timestamp", bson.D{{"$gte", nowTime}}}},
 		},
 	}}}}
 
@@ -243,5 +243,10 @@ func FindMarketData(minute time.Duration) (*model.Market, error) {
 		cBid <- true
 	}()
 
-	return &market, nil
+	if <-cAsk && <-cBid {
+		return &market, nil
+	} else {
+		return nil, errFindMarketData
+	}
+
 }

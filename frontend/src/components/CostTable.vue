@@ -18,6 +18,8 @@
       :disable-pagination="true"
       :hide-default-footer="true"
       item-key="korean_name"
+      :loading="IsLoading"
+      loading-text="데이터 수신중입니다"
     >
       <template class="d-flex flex-row" v-slot:[`item.korean_name`]="{ item }">
         <div>
@@ -121,7 +123,11 @@ export default {
       );
     },
   },
-  computed: {},
+  computed: {
+    IsLoading() {
+      return this.coinInfo.length === 0;
+    },
+  },
   async created() {
     try {
       await this.$store.dispatch('COININFO');

@@ -12,7 +12,13 @@
       ></v-text-field>
     </v-card-title>
 
-    <v-data-table :headers="headers" :items="marketData" :search="search">
+    <v-data-table
+      :headers="headers"
+      :items="marketData"
+      :search="search"
+      :loading="IsLoading"
+      loading-text="데이터 수신중입니다"
+    >
       <template class="d-flex flex-row" v-slot:[`item.codeName`]="{ item }">
         <div>
           <img
@@ -112,6 +118,11 @@ export default {
       clearInterval(this.interval);
       this.interval = undefined;
     }
+  },
+  computed: {
+    IsLoading() {
+      return this.marketData.length === 0;
+    },
   },
   methods: {
     async getMarketData(min) {
