@@ -47,7 +47,16 @@
           </template>
         </template>
         <template v-else>
-          <div class="price-down bold">{{ item.price.toLocaleString() }}</div>
+          <template v-if="item.askBid == 'ASK'">
+            <div class="price-down bold price-border-ask">
+              {{ item.price.toLocaleString() }}
+            </div>
+          </template>
+          <template v-else>
+            <div class="price-down bold price-border-bid">
+              {{ item.price.toLocaleString() }}
+            </div>
+          </template>
         </template>
       </template>
 
